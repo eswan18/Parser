@@ -30,6 +30,10 @@ int main(int argc, char *argv[]) {
 
 int scan(char *filename) {
         yyin  = fopen(filename,"r");
+	if (!yyin) {
+		fprintf(stderr,"scan error: unable to open %s\n",filename);
+		exit(1);
+	}
         while(yyin) {
                 token_t t = yylex();
                 if (!t)
