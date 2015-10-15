@@ -6,10 +6,9 @@
 DIGIT [0-9]
 LETTER [a-zA-Z]
 LEGALSTRING [^\n\t\r\\\"]|(\\[^\n\t\r])|(\\\")
-ESCAPEDQUOTE \\\"
+LEGALCOMMENT [^\*\\]|(\\\*)|(\\[^\*])
 %%
-"/*"[^\*]*"*/" { return TOKEN_COMMENT; }
-"/*"(([^\*]*)|(\*[^\\]))*"*/" { return TOKEN_COMMENT; }
+"/*"{LEGALCOMMENT}*"*/" { return TOKEN_COMMENT; }
 "//".*\n { return TOKEN_COMMENT; }
 print { return TOKEN_PRINT; }
 function { return TOKEN_FUNCTION; }
