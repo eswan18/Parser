@@ -5,7 +5,8 @@
 %}
 DIGIT [0-9]
 LETTER [a-zA-Z]
-LEGALSTRING [^\n\t\r]
+LEGALSTRING [^\n\t\r\\\"]|(\\[^\n\t\r])|(\\\")
+ESCAPEDQUOTE \\\"
 %%
 "/*"[^\*]*"*/" { return TOKEN_COMMENT; }
 "/*"(([^\*]*)|(\*[^\\]))*"*/" { return TOKEN_COMMENT; }
@@ -54,10 +55,8 @@ true { return TOKEN_TRUE; }
 false { return TOKEN_FALSE; }
 \'\\?.\' { return TOKEN_CHAR_LITERAL; }
 {DIGIT}+ { return TOKEN_INTEGER_LITERAL; }
-(\"\") { return TOKEN_STRING_LITERAL; }
-\"[^\n\r\t]*[^\n\t\r\\]\" { return TOKEN_STRING_LITERAL; /* doesn't handle "hi\\" */}
-\"(\\\\)+\" { return TOKEN_STRING_LITERAL; }
-\"[^\n\r\t]*[^\n\r\t\\](\\\\)*\" { return TOKEN_STRING_LITERAL; }
+"\"\"" { return TOKEN_STRING_LITERAL; }
+\"{LEGALSTRING}+\" { return TOKEN_STRING_LITERAL; }
 ({LETTER}|_)({LETTER}|{DIGIT}|_)*	{ return TOKEN_IDENTIFIER; }
 [ \t\n\r] {}
 . {
