@@ -3,6 +3,8 @@
 
 extern FILE *yyin;
 extern char *yytext;
+extern int yyparse();
+extern double parser_result;
 
 int scan(char *filename);
 int parse(char *filename);

@@ -1,3 +1,6 @@
+#ifndef TOKEN_H
+#define TOKEN_H
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -54,3 +57,5 @@ enum token {
 
 typedef enum token token_t;
 const char* token_string(token_t t);
+
+#endif
