@@ -19,10 +19,84 @@ double parser_result = 0.0;
 
 %%
 
-program: thing
-		{do this;}
+program: decl_list
 	;
 
+decl_list: decl decl_list /*{
+		$1 -> next = $2;
+		$$ = $1;
+}*/
+	| /* nothing */
+
+decl: ident TOKEN_COLON type TOKEN_EQ expr TOKEN_SEMI
+	| ident colon type TOKEN_SEMI
+	| ident colon type TOKEN_EQ TOKEN_LEFT_BRACE stmt_list TOKEN_RIGHT_BRACE
+
+type: TOKEN_INTEGER
+	| TOKEN_VOID
+	| TOKEN_STRING
+	| TOKEN_CHAR
+	| TOKEN_BOOLEAN
+	| TOKEN_ARRAY TOKEN_LEFT_BRACKET opt_expr TOKEN_RIGHT_BRACKET type
+	| TOKEN_FUNCTION type TOKEN_LEFT_PAREN param_list TOKEN_RIGHT_PAREN
+	;
+
+param_list: not_empty_param_list
+	| /* nothing */
+
+not_emtpy_param_list: param
+	| param TOKEN_COMMA not_empty_param_list
+	;
+
+param:	ident
+	;
+/* Redefintions of terminals
+eof: TOKEN_EOF;
+print: TOKEN_PRINT;
+function: TOKEN_FUNCTION;
+for: TOKEN_FOR;
+if: TOKEN_IF;
+then: TOKEN_THEN;
+else: TOKEN_ELSE;
+return: TOKEN_RETURN;
+left_brace: TOKEN_LEFT_BRACE;
+right_brace: TOKEN_RIGHT_BRACE;
+left_paren: TOKEN_LEFT_PAREN;
+right_paren: TOKEN_RIGHT_PAREN;
+left_bracket: TOKEN_LEFT_BRACKET;
+right_bracket: TOKEN_RIGHT_BRACKET;
+string: TOKEN_STRING;
+integer: TOKEN_INTEGER;
+char: TOKEN_CHAR;
+void: TOKEN_VOID;
+boolean: TOKEN_BOOLEAN;
+array: TOKEN_ARRAY;
+ge: TOKEN_GE;
+le: TOKEN_LE;
+eq: TOKEN_EQ;
+ne: TOKEN_NE;
+lt: TOKEN_LT;
+gt: TOKEN_GT;
+and: TOKEN_AND;
+or: TOKEN_OR;
+increment: TOKEN_INCREMENT;
+decrement: TOKEN_DECREMENT;
+add: TOKEN_ADD;
+subtract: TOKEN_SUBTRACT;
+multiply: TOKEN_MULTIPLY;
+divide: TOKEN_DIVIDE;
+modulus: TOKEN_MODULUS;
+exponentiate: TOKEN_EXPONENTIATE;
+assign: TOKEN_ASSIGN;
+comma: TOKEN_COMMA;
+colon: TOKEN_COLON;
+semicolon: TOKEN_SEMICOLON;
+true: TOKEN_TRUE;
+false: TOKEN_FALSE;
+char_literal: TOKEN_CHAR_LITERAL;
+integer_literal: TOKEN_INTEGER_LITERAL;
+string_literal: TOKEN_STRING_LITERAL;
+identifier: TOKEN_IDENTIFIER;
 %%
 
 int yyerror(char *str) {
