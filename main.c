@@ -23,7 +23,6 @@ int main(int argc, char *argv[]) {
 	if (strcmp(option,"-scan") == 0) {
 		scan(filename);
 	} else if (strcmp(option,"-parse") == 0) {
-		scan(filename);
 		parse(filename);
 	}
 	
@@ -58,5 +57,10 @@ int scan(char *filename) {
 }
 
 int parse(char *filename) {
-	return 0;
+	if(yyparse() == 0){
+		return 0;
+	} else {
+		printf("Parse Failed!\n");
+		return 1;
+	}
 }
