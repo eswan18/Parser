@@ -1,4 +1,51 @@
-%token TOKEN_THING
+%token TOKEN_EOF
+%token TOKEN_PRINT
+%token TOKEN_FUNCTION
+%token TOKEN_WHILE
+%token TOKEN_FOR
+%token TOKEN_IF
+%token TOKEN_THEN
+%token TOKEN_ELSE
+%token TOKEN_RETURN
+%token TOKEN_LEFT_BRACE
+%token TOKEN_RIGHT_BRACE
+%token TOKEN_LEFT_PAREN
+%token TOKEN_RIGHT_PAREN
+%token TOKEN_LEFT_BRACKET
+%token TOKEN_RIGHT_BRACKET
+%token TOKEN_STRING
+%token TOKEN_INTEGER
+%token TOKEN_CHAR
+%token TOKEN_VOID
+%token TOKEN_BOOLEAN
+%token TOKEN_ARRAY
+%token TOKEN_GE
+%token TOKEN_LE
+%token TOKEN_EQ
+%token TOKEN_NE
+%token TOKEN_LT
+%token TOKEN_GT
+%token TOKEN_AND
+%token TOKEN_OR
+%token TOKEN_INCREMENT
+%token TOKEN_DECREMENT
+%token TOKEN_ADD
+%token TOKEN_SUBTRACT
+%token TOKEN_MULTIPLY
+%token TOKEN_DIVIDE
+%token TOKEN_MODULUS
+%token TOKEN_EXPONENTIATE
+%token TOKEN_ASSIGN
+%token TOKEN_COMMA
+%token TOKEN_COLON
+%token TOKEN_SEMICOLON
+%token TOKEN_TRUE
+%token TOKEN_FALSE
+%token TOKEN_CHAR_LITERAL
+%token TOKEN_INTEGER_LITERAL
+%token TOKEN_STRING_LITERAL
+%token TOKEN_IDENTIFIER
+%token TOKEN_COMMENT
 
 %{
 #include <stuff>
@@ -28,29 +75,29 @@ decl_list: decl decl_list /*{
 }*/
 	| /* nothing */
 
-decl: ident TOKEN_COLON type TOKEN_EQ expr TOKEN_SEMI
-	| ident colon type TOKEN_SEMI
-	| ident colon type TOKEN_EQ TOKEN_LEFT_BRACE stmt_list TOKEN_RIGHT_BRACE
+decl: identifier colon type eq expr semicolon
+	| identifier colon type semicolon
+	| identifier colon type eq left_brace stmt_list right_brace
 
 type: TOKEN_INTEGER
-	| TOKEN_VOID
-	| TOKEN_STRING
-	| TOKEN_CHAR
-	| TOKEN_BOOLEAN
-	| TOKEN_ARRAY TOKEN_LEFT_BRACKET opt_expr TOKEN_RIGHT_BRACKET type
-	| TOKEN_FUNCTION type TOKEN_LEFT_PAREN param_list TOKEN_RIGHT_PAREN
+	| void
+	| string
+	| char
+	| boolean
+	| array left_bracket opt_expr right_bracket type
+	| function type left_paren param_list right_paren
 	;
 
 param_list: not_empty_param_list
 	| /* nothing */
 
 not_emtpy_param_list: param
-	| param TOKEN_COMMA not_empty_param_list
+	| param comma not_empty_param_list
 	;
 
-param:	ident
+param:	identifier
 	;
-/* Redefintions of terminals
+/* Redefintions of terminals */
 eof: TOKEN_EOF;
 print: TOKEN_PRINT;
 function: TOKEN_FUNCTION;
