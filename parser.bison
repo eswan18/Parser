@@ -1,4 +1,3 @@
-%token TOKEN_EOF
 %token TOKEN_PRINT
 %token TOKEN_FUNCTION
 %token TOKEN_WHILE
@@ -78,7 +77,7 @@ decl_list: decl decl_list /*{
 
 decl: identifier colon type eq expr semicolon
 	| identifier colon type semicolon
-	| identifier colon type eq left_brace stmt_list right_brace
+	| identifier colon type assign left_brace stmt_list right_brace
 	;
 
 stmt: decl
@@ -112,6 +111,10 @@ expr: expr add expr
 	| expr and expr
 	| expr or expr
 	| not expr
+	| expr increment
+	| expr decrement
+	| expr modulus expr
+	| expr exponentiate expr
 	| primary_expr
 	;
 
@@ -124,14 +127,14 @@ expr_list: expr expr_list
 
 primary_expr: identifier
 	| identifier left_paren expr_list right_paren
-	| integer
-	| string
-	| char
+	| integer_literal
+	| string_literal
+	| char_literal
 	| true
 	| false
 	| left_paren expr right_paren
 	| left_brace expr_list right_brace
-	| subtract integer
+	| subtract integer_literal
 	| subtract left_paren expr right_paren
 	;
 
@@ -155,7 +158,6 @@ param:	identifier
 	;
 
 /* Redefintions of terminals */
-eof: TOKEN_EOF;
 print: TOKEN_PRINT;
 function: TOKEN_FUNCTION;
 for: TOKEN_FOR;
