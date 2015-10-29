@@ -57,10 +57,10 @@ int scan(char *filename) {
 }
 
 int parse(char *filename) {
-	if(yyparse() == 0){
+	/*if(yyparse() == 0){
 		return 0;
 	} else {
 		printf("Parse Failed!\n");
 		return 1;
-	}
+	}*/
 }

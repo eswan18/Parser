@@ -38,6 +38,7 @@ array { return TOKEN_ARRAY; }
 ">" { return TOKEN_GT; }
 "&&" { return TOKEN_AND; }
 "||" { return TOKEN_OR; }
+"!" { return TOKEN_NOT; }
 "++" { return TOKEN_INCREMENT; }
 "--" { return TOKEN_DECREMENT; }
 "+" { return TOKEN_ADD; }

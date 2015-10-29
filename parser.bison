@@ -74,12 +74,54 @@ decl_list: decl decl_list /*{
 		$$ = $1;
 }*/
 	| /* nothing */
+	;
 
 decl: identifier colon type eq expr semicolon
 	| identifier colon type semicolon
 	| identifier colon type eq left_brace stmt_list right_brace
+	;
 
-type: TOKEN_INTEGER
+stmt: decl
+	| expr semicolon
+	| for left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren stmt
+	;
+
+stmt_list:
+	;
+
+expr: expr add primary_expr
+	| expr subtract primary_expr
+	| expr multiply primary_expr
+	| expr divide primary_expr
+	| expr eq primary_expr
+	| expr ne primary_expr
+	| expr gt primary_expr
+	| expr ge primary_expr
+	| expr lt primary_expr
+	| expr le primary_expr
+	;
+
+opt_expr: expr
+	| /* nothing */
+	;
+
+expr_list: expr expr_list
+	| /* nothing */
+
+primary_expr: identifier
+	| identifier left_paren expr_list right_paren
+	| integer
+	| string
+	| char
+	| true
+	| false
+	| left_paren expr right_paren
+	| left_brace expr_list right_brace
+	| subtract integer
+	| subtract left_paren expr right_paren
+	;
+
+type: integer
 	| void
 	| string
 	| char
@@ -91,12 +133,13 @@ type: TOKEN_INTEGER
 param_list: not_empty_param_list
 	| /* nothing */
 
-not_emtpy_param_list: param
+not_empty_param_list: param
 	| param comma not_empty_param_list
 	;
 
 param:	identifier
 	;
+
 /* Redefintions of terminals */
 eof: TOKEN_EOF;
 print: TOKEN_PRINT;

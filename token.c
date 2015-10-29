@@ -60,6 +60,8 @@ const char* token_string(token_t t) {
 			return "AND";
 		case TOKEN_OR:
 			return "OR";
+		case TOKEN_NOT:
+			return "NOT";
 		case TOKEN_INCREMENT:
 			return "INCREMENT";
 		case TOKEN_DECREMENT:
