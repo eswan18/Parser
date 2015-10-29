@@ -14,8 +14,6 @@ const char* token_string(token_t t) {
 			return "FOR";
 		case TOKEN_IF:
 			return "IF";
-		case TOKEN_THEN:
-			return "THEN";
 		case TOKEN_ELSE:
 			return "ELSE";
 		case TOKEN_RETURN:

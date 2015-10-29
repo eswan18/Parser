@@ -15,7 +15,6 @@ function { return TOKEN_FUNCTION; }
 while { return TOKEN_WHILE; }
 for { return TOKEN_FOR; }
 if { return TOKEN_IF; }
-then { return TOKEN_THEN; }
 else { return TOKEN_ELSE; }
 return { return TOKEN_RETURN; }
 "{" { return TOKEN_LEFT_BRACE; }

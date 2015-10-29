@@ -4,7 +4,6 @@
 %token TOKEN_WHILE
 %token TOKEN_FOR
 %token TOKEN_IF
-%token TOKEN_THEN
 %token TOKEN_ELSE
 %token TOKEN_RETURN
 %token TOKEN_LEFT_BRACE
@@ -27,6 +26,7 @@
 %token TOKEN_GT
 %token TOKEN_AND
 %token TOKEN_OR
+%token TOKEN_NOT
 %token TOKEN_INCREMENT
 %token TOKEN_DECREMENT
 %token TOKEN_ADD
@@ -83,22 +83,36 @@ decl: identifier colon type eq expr semicolon
 
 stmt: decl
 	| expr semicolon
+	| return expr semicolon
+	| print expr semicolon
 	| for left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren stmt
+	| if expr stmt
+	| if expr stmt else stmt
+	| left_brace stmt_list right_brace
 	;
 
-stmt_list:
+stmt_list: not_empty_stmt_list
+	| /* nothing */
 	;
 
-expr: expr add primary_expr
-	| expr subtract primary_expr
-	| expr multiply primary_expr
-	| expr divide primary_expr
-	| expr eq primary_expr
-	| expr ne primary_expr
-	| expr gt primary_expr
-	| expr ge primary_expr
-	| expr lt primary_expr
-	| expr le primary_expr
+not_empty_stmt_list: stmt not_empty_stmt_list
+	| stmt
+	;
+
+expr: expr add expr
+	| expr subtract expr
+	| expr multiply expr
+	| expr divide expr
+	| expr eq expr
+	| expr ne expr
+	| expr gt expr
+	| expr ge expr
+	| expr lt expr
+	| expr le expr
+	| expr and expr
+	| expr or expr
+	| not expr
+	| primary_expr
 	;
 
 opt_expr: expr
@@ -146,7 +160,6 @@ print: TOKEN_PRINT;
 function: TOKEN_FUNCTION;
 for: TOKEN_FOR;
 if: TOKEN_IF;
-then: TOKEN_THEN;
 else: TOKEN_ELSE;
 return: TOKEN_RETURN;
 left_brace: TOKEN_LEFT_BRACE;
@@ -169,6 +182,7 @@ lt: TOKEN_LT;
 gt: TOKEN_GT;
 and: TOKEN_AND;
 or: TOKEN_OR;
+not: TOKEN_NOT;
 increment: TOKEN_INCREMENT;
 decrement: TOKEN_DECREMENT;
 add: TOKEN_ADD;
