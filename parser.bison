@@ -73,7 +73,7 @@ decl_list: decl decl_list /*{
 	| /* nothing */
 	;
 
-decl: identifier colon type eq expr semicolon
+decl: identifier colon type assign expr semicolon
 	| identifier colon type semicolon
 	| identifier colon type assign left_brace stmt_list right_brace
 	;
@@ -83,8 +83,8 @@ stmt: decl
 	| return opt_expr semicolon
 	| print expr_list semicolon
 	| for left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren stmt
-	| if expr stmt
-	| if expr stmt else stmt
+	| if left_paren expr right_paren stmt
+	| if left_paren expr right_paren stmt else stmt
 	| left_brace stmt_list right_brace
 	;
 
@@ -96,23 +96,24 @@ not_empty_stmt_list: stmt not_empty_stmt_list
 	| stmt
 	;
 
-expr: expr add expr
-	| expr subtract expr
-	| expr multiply expr
-	| expr divide expr
-	| expr eq expr
-	| expr ne expr
-	| expr gt expr
-	| expr ge expr
-	| expr lt expr
-	| expr le expr
-	| expr and expr
-	| expr or expr
-	| not expr
+expr: expr add primary_expr
+	| expr subtract primary_expr
+	| expr multiply primary_expr
+	| expr divide primary_expr
+	| expr eq primary_expr
+	| expr ne primary_expr
+	| expr gt primary_expr
+	| expr ge primary_expr
+	| expr lt primary_expr
+	| expr le primary_expr
+	| expr and primary_expr
+	| expr or primary_expr
+	| not primary_expr
 	| expr increment
 	| expr decrement
-	| expr modulus expr
-	| expr exponentiate expr
+	| expr modulus primary_expr
+	| expr exponentiate primary_expr
+	| subtract primary_expr
 	| primary_expr
 	;
 
@@ -128,8 +129,7 @@ not_empty_expr_list: expr comma not_empty_expr_list
 	| expr
 	;
 
-primary_expr: identifier
-	| identifier left_paren expr_list right_paren
+primary_expr: identifier opt_parenthetical_expr_list
 	| integer_literal
 	| string_literal
 	| char_literal
@@ -137,8 +137,10 @@ primary_expr: identifier
 	| false
 	| left_paren expr right_paren
 	| left_brace not_empty_expr_list right_brace
-	| subtract integer_literal
-	| subtract left_paren expr right_paren
+	;
+
+opt_parenthetical_expr_list: left_paren expr_list right_paren
+	| /* nothing */
 	;
 
 type: integer
