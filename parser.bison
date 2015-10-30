@@ -1,6 +1,5 @@
 %token TOKEN_PRINT
 %token TOKEN_FUNCTION
-%token TOKEN_WHILE
 %token TOKEN_FOR
 %token TOKEN_IF
 %token TOKEN_ELSE
@@ -44,7 +43,6 @@
 %token TOKEN_INTEGER_LITERAL
 %token TOKEN_STRING_LITERAL
 %token TOKEN_IDENTIFIER
-%token TOKEN_COMMENT
 
 %{
 #include <stuff>
@@ -82,8 +80,8 @@ decl: identifier colon type eq expr semicolon
 
 stmt: decl
 	| expr semicolon
-	| return expr semicolon
-	| print expr semicolon
+	| return opt_expr semicolon
+	| print expr_list semicolon
 	| for left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren stmt
 	| if expr stmt
 	| if expr stmt else stmt
@@ -122,8 +120,13 @@ opt_expr: expr
 	| /* nothing */
 	;
 
-expr_list: expr expr_list
+expr_list: not_empty_expr_list
 	| /* nothing */
+	;
+
+not_empty_expr_list: expr comma not_empty_expr_list
+	| expr
+	;
 
 primary_expr: identifier
 	| identifier left_paren expr_list right_paren
@@ -133,7 +136,7 @@ primary_expr: identifier
 	| true
 	| false
 	| left_paren expr right_paren
-	| left_brace expr_list right_brace
+	| left_brace not_empty_expr_list right_brace
 	| subtract integer_literal
 	| subtract left_paren expr right_paren
 	;
@@ -149,6 +152,7 @@ type: integer
 
 param_list: not_empty_param_list
 	| /* nothing */
+	;
 
 not_empty_param_list: param
 	| param comma not_empty_param_list
