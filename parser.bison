@@ -78,14 +78,22 @@ decl: identifier colon type assign expr semicolon
 	| identifier colon type assign left_brace stmt_list right_brace
 	;
 
-stmt: decl
+stmt: open_stmt
+	| closed_stmt
+	;
+
+closed_stmt: decl
 	| expr semicolon
 	| return opt_expr semicolon
 	| print expr_list semicolon
-	| for left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren stmt
-	| if left_paren expr right_paren stmt
-	| if left_paren expr right_paren stmt else stmt
+	| for left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren closed_stmt
+	| if left_paren expr right_paren closed_stmt else closed_stmt
 	| left_brace stmt_list right_brace
+	;
+
+open_stmt: if left_paren expr right_paren stmt
+	| if left_paren expr right_paren closed_stmt else open_stmt
+	| for left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren open_stmt
 	;
 
 stmt_list: not_empty_stmt_list
