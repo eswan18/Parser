@@ -104,24 +104,41 @@ not_empty_stmt_list: stmt not_empty_stmt_list
 	| stmt
 	;
 
-expr: expr add primary_expr
-	| expr subtract primary_expr
-	| expr multiply primary_expr
-	| expr divide primary_expr
-	| expr eq primary_expr
-	| expr ne primary_expr
-	| expr gt primary_expr
-	| expr ge primary_expr
-	| expr lt primary_expr
-	| expr le primary_expr
-	| expr and primary_expr
-	| expr or primary_expr
-	| not primary_expr
-	| expr increment
-	| expr decrement
-	| expr modulus primary_expr
-	| expr exponentiate primary_expr
-	| subtract primary_expr
+expr: expr and compare_expr
+	| expr or compare_expr
+	| compare_expr
+	;
+
+compare_expr: add_expr ne add_expr
+	| add_expr gt add_expr
+	| add_expr ge add_expr
+	| add_expr lt add_expr
+	| add_expr le add_expr
+	| add_expr eq add_expr
+	| add_expr
+	;
+
+add_expr: add_expr add mul_expr
+	| add_expr subtract mul_expr
+	| mul_expr
+	;
+
+mul_expr: mul_expr multiply expon_expr
+	| mul_expr divide expon_expr
+	| mul_expr modulus expon_expr
+	| expon_expr
+	;
+
+expon_expr: neg_expr exponentiate expon_expr
+	| neg_expr
+	;
+
+neg_expr: subtract incr_expr
+	| not incr_expr
+	;
+
+incr_expr: primary_expr increment
+	| primary_expr decrement
 	| primary_expr
 	;
 
