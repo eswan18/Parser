@@ -83,7 +83,7 @@ double parser_result = 0.0;
 %type <expr> expr compare_expr add_expr mul_expr expon_expr neg_expr incr_expr opt_expr expr_list not_empty_expr_list primary_expr;
 %type <stmt> stmt open_stmt closed_stmt stmt_list not_empty_stmt_list;
 %type <type> type;
-%type <param_list> param_list not_empty_param_list param opt_parenthetical_param_list;
+%type <param_list> param_list not_empty_param_list param;
 %type <name> identifier string_literal;
 %type <integer> integer_literal char_literal;
 
@@ -275,8 +275,11 @@ not_empty_expr_list: expr comma not_empty_expr_list
 }
 	;
 
-primary_expr: identifier opt_parenthetical_expr_list {
+primary_expr: identifier {
 	$$ = expr_create_name($1);
+}
+	| identifier left_paren expr_list right_paren {
+	
 }
 	| integer_literal {
 	$$ = expr_create_integer_literal($1);
@@ -298,20 +301,6 @@ primary_expr: identifier opt_parenthetical_expr_list {
 }
 	| left_brace not_empty_expr_list right_brace {
 	$$ = $2;
-}
-	;
-
-opt_parenthetical_expr_list: not_empty_expr_list {
-	$$ = $1;
-}
-	| /* nothing */ {
-}
-	;
-
-opt_parenthetical_param_list: left_paren param_list right_paren {
-	$$ = $2;
-}
-	| /* nothing */ {
 }
 	;
 
