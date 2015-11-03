@@ -7,8 +7,21 @@ typedef enum {
 	EXPR_ADD,
 	EXPR_SUB,
 	EXPR_MUL,
-	EXPR_DIV
-	/* many more types to add here */
+	EXPR_DIV,
+	EXPR_MOD,
+	EXPR_AND,
+	EXPR_OR,
+	EXPR_NOT,
+	EXPR_LT,
+	EXPR_LE,
+	EXPR_GT,
+	EXPR_GE,
+	EXPR_EQ,
+	EXPR_NE,
+	EXPR_EXPON,
+	EXPR_INCR,
+	EXPR_DECR,
+	EXPR_NEG,
 } expr_t;
 
 struct expr {

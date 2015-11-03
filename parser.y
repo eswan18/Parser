@@ -76,14 +76,17 @@ double parser_result = 0.0;
 	struct type *type;
 	struct param_list *param_list;
 	char *name;
+	int integer;
 };
 
 %type <decl> program decl_list decl;
-%type <expr> expr compare_expr add_expr mul_expr expon_expr neg_expr incr_expr opt_expr expr_list not_empty_expr_list primary_expr opt_parenthetical_expr_list;
+%type <expr> expr compare_expr add_expr mul_expr expon_expr neg_expr incr_expr opt_expr expr_list not_empty_expr_list primary_expr;
 %type <stmt> stmt open_stmt closed_stmt stmt_list not_empty_stmt_list;
 %type <type> type;
-%type <param_list> param_list not_empty_param_list param;
-%type <name> identifier;
+%type <param_list> param_list not_empty_param_list param opt_parenthetical_param_list;
+%type <name> identifier string_literal;
+%type <integer> integer_literal char_literal;
+
 
 program: decl_list
 	;
@@ -138,101 +141,222 @@ closed_stmt: decl {
 }
 	;
 
-open_stmt: if left_paren expr right_paren stmt
-	| if left_paren expr right_paren closed_stmt else open_stmt
-	| for left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren open_stmt
+open_stmt: if left_paren expr right_paren stmt {
+	$$ = stmt_create(STMT_IF_ELSE,0,0,$3,0,$5,0);
+}
+	| if left_paren expr right_paren closed_stmt else open_stmt {
+	$$ = stmt_create(STMT_IF_ELSE,0,0,$3,0,$5,$7);
+}
+	| for left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren open_stmt {
+	$$ = stmt_create(STMT_FOR,0,$3,$5,$7,$9,0);
+}
 	;
 
 stmt_list: not_empty_stmt_list
-	| /* nothing */
+	| /* nothing */ {
+}
 	;
 
-not_empty_stmt_list: stmt not_empty_stmt_list
-	| stmt
+not_empty_stmt_list: stmt not_empty_stmt_list {
+	$1 -> next = $2;
+	$$ = $1;
+}
+	| stmt {
+	$$ = $1;
+}
 	;
 
-expr: expr and compare_expr
-	| expr or compare_expr
-	| compare_expr
+expr: expr and compare_expr {
+	$$ = expr_create(EXPR_ADD,$1,$3);
+}
+	| expr or compare_expr {
+	$$ = expr_create(EXPR_OR,$1,$3);
+}
+	| compare_expr {
+	$$ = $1;
+}
 	;
 
-compare_expr: add_expr ne add_expr
-	| add_expr gt add_expr
-	| add_expr ge add_expr
-	| add_expr lt add_expr
-	| add_expr le add_expr
-	| add_expr eq add_expr
-	| add_expr
+compare_expr: add_expr ne add_expr {
+	$$ = expr_create(EXPR_NE,$1,$3);
+}
+	| add_expr gt add_expr {
+	$$ = expr_create(EXPR_GT,$1,$3);
+}
+	| add_expr ge add_expr {
+	$$ = expr_create(EXPR_GE,$1,$3);
+}
+	| add_expr lt add_expr {
+	$$ = expr_create(EXPR_LT,$1,$3);
+}
+	| add_expr le add_expr {
+	$$ = expr_create(EXPR_LE,$1,$3);
+}
+	| add_expr eq add_expr {
+	$$ = expr_create(EXPR_EQ,$1,$3);
+}
+	| add_expr {
+	$$ = $1;
+}
 	;
 
-add_expr: add_expr add mul_expr
-	| add_expr subtract mul_expr
-	| mul_expr
+add_expr: add_expr add mul_expr {
+	$$ = expr_create(EXPR_ADD,$1,$3);
+}
+	| add_expr subtract mul_expr {
+	$$ = expr_create(EXPR_SUB,$1,$3);
+}
+	| mul_expr {
+	$$ = $1;
+}
 	;
 
-mul_expr: mul_expr multiply expon_expr
-	| mul_expr divide expon_expr
-	| mul_expr modulus expon_expr
-	| expon_expr
+mul_expr: mul_expr multiply expon_expr {
+	$$ = expr_create(EXPR_MUL,$1,$3);
+}
+	| mul_expr divide expon_expr {
+	$$ = expr_create(EXPR_DIV,$1,$3);
+}
+	| mul_expr modulus expon_expr {
+	$$ = expr_create(EXPR_MOD,$1,$3);
+}
+	| expon_expr {
+	$$ = $1;
+}
 	;
 
-expon_expr: neg_expr exponentiate expon_expr
-	| neg_expr
+expon_expr: neg_expr exponentiate expon_expr {
+	$$ = expr_create(EXPR_EXPON,$1,$3);
+}
+	| neg_expr {
+	$$ = $1;
+}
 	;
 
-neg_expr: subtract incr_expr
-	| not incr_expr
+neg_expr: subtract incr_expr {
+	$$ = expr_create(EXPR_NEG,$2,0);
+}
+	| not incr_expr {
+	$$ = expr_create(EXPR_NOT,$2,0);
+}
+	| incr_expr {
+	$$ = $1;
+}
 	;
 
-incr_expr: primary_expr increment
-	| primary_expr decrement
-	| primary_expr
+incr_expr: primary_expr increment {
+	$$ = expr_create(EXPR_INCR,$1,0);
+}
+	| primary_expr decrement {
+	$$ = expr_create(EXPR_DECR,$1,0);
+}
+	| primary_expr {
+	$$ = $1;
+}
 	;
 
-opt_expr: expr
-	| /* nothing */
+opt_expr: expr {
+	$$ = $1;
+}
+	| /* nothing */ {
+}
 	;
 
-expr_list: not_empty_expr_list
-	| /* nothing */
+expr_list: not_empty_expr_list {
+	$$ = $1;
+}
+	| /* nothing */ {
+}
 	;
 
 not_empty_expr_list: expr comma not_empty_expr_list
-	| expr
+	| expr {
+	$$ = $1;
+}
 	;
 
-primary_expr: identifier opt_parenthetical_expr_list
-	| integer_literal
-	| string_literal
-	| char_literal
-	| true
-	| false
-	| left_paren expr right_paren
-	| left_brace not_empty_expr_list right_brace
+primary_expr: identifier opt_parenthetical_expr_list {
+	$$ = expr_create_name($1);
+}
+	| integer_literal {
+	$$ = expr_create_integer_literal($1);
+}
+	| string_literal {
+	$$ = expr_create_string_literal($1);
+}
+	| char_literal {
+	$$ = expr_create_character_literal($1);
+}
+	| true {
+	$$ = expr_create_boolean_literal(1);
+}
+	| false {
+	$$ = expr_create_boolean_literal(0);
+}
+	| left_paren expr right_paren {
+	$$ = $2;
+}
+	| left_brace not_empty_expr_list right_brace {
+	$$ = $2;
+}
 	;
 
-opt_parenthetical_expr_list: left_paren expr_list right_paren
-	| /* nothing */
+opt_parenthetical_expr_list: not_empty_expr_list {
+	$$ = $1;
+}
+	| /* nothing */ {
+}
 	;
 
-type: integer
-	| void
-	| string
-	| char
-	| boolean
-	| array left_bracket opt_expr right_bracket type
-	| function type left_paren param_list right_paren
+opt_parenthetical_param_list: left_paren param_list right_paren {
+	$$ = $2;
+}
+	| /* nothing */ {
+}
 	;
 
-param_list: not_empty_param_list
-	| /* nothing */
+type: integer {
+	type_create(TYPE_INTEGER,0,0);
+}
+	| void {
+	type_create(TYPE_VOID,0,0);
+}
+	| string {
+	type_create(TYPE_STRING,0,0);
+}
+	| char {
+	type_create(TYPE_CHARACTER,0,0);
+}
+	| boolean {
+	type_create(TYPE_BOOLEAN,0,0);
+}
+	| array left_bracket opt_expr right_bracket type {
+	type_create(TYPE_ARRAY,0,$5);
+}
+	| function type left_paren param_list right_paren {
+	type_create(TYPE_FUNCTION,$4,$2);
+}
 	;
 
-not_empty_param_list: param
-	| param comma not_empty_param_list
+param_list: not_empty_param_list {
+	$$ = $1;
+}
+	| /* nothing */ {
+}
 	;
 
-param:	identifier
+not_empty_param_list: param {
+	$$ = $1;
+}
+	| param comma not_empty_param_list {
+	$1 -> next = $3;
+	$$ = $1;
+}
+	;
+
+param:	type colon identifier {
+	$$ = param_list_create($3,$1,0);
+}
 	;
 
 /* Redefintions of terminals */
@@ -277,9 +401,15 @@ colon: TOKEN_COLON;
 semicolon: TOKEN_SEMICOLON;
 true: TOKEN_TRUE;
 false: TOKEN_FALSE;
-char_literal: TOKEN_CHAR_LITERAL;
-integer_literal: TOKEN_INTEGER_LITERAL;
-string_literal: TOKEN_STRING_LITERAL;
+char_literal: TOKEN_CHAR_LITERAL {
+	$$ = yytext[0];
+};
+integer_literal: TOKEN_INTEGER_LITERAL {
+	$$ = atoi(yytext)
+};
+string_literal: TOKEN_STRING_LITERAL {
+	$$ = yytext;
+};
 identifier: TOKEN_IDENTIFIER {
 	$$ = yytext;
 };
