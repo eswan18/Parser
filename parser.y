@@ -46,6 +46,8 @@
 
 %{
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include "decl.h"
 #include "stmt.h"
 #include "expr.h"
@@ -96,7 +98,7 @@ decl_list: decl decl_list {
 		$$ = $1;
 }
 	| /* nothing */ {
-	}
+}
 	;
 
 decl: identifier colon type assign expr semicolon {
@@ -152,7 +154,9 @@ open_stmt: if left_paren expr right_paren stmt {
 }
 	;
 
-stmt_list: not_empty_stmt_list
+stmt_list: not_empty_stmt_list {
+	$$ = $1;
+}
 	| /* nothing */ {
 }
 	;
@@ -269,9 +273,11 @@ expr_list: not_empty_expr_list {
 }
 	;
 
-not_empty_expr_list: expr comma not_empty_expr_list
+not_empty_expr_list: expr comma not_empty_expr_list {
+	$$ = expr_create(EXPR_LIST,$1,$3);
+}
 	| expr {
-	$$ = $1;
+	$$ = expr_create(EXPR_LIST,$1,0);
 }
 	;
 
@@ -279,7 +285,8 @@ primary_expr: identifier {
 	$$ = expr_create_name($1);
 }
 	| identifier left_paren expr_list right_paren {
-	
+	struct expr *id = expr_create_name($1);
+	expr_create(EXPR_FUNC,id,$3);
 }
 	| integer_literal {
 	$$ = expr_create_integer_literal($1);
@@ -394,16 +401,21 @@ char_literal: TOKEN_CHAR_LITERAL {
 	$$ = yytext[0];
 };
 integer_literal: TOKEN_INTEGER_LITERAL {
-	$$ = atoi(yytext)
+	$$ = atoi(yytext);
 };
 string_literal: TOKEN_STRING_LITERAL {
-	$$ = yytext;
+	char *str = malloc(sizeof(char) * 256);
+	strcpy(str,yytext);
+	$$ = str;
 };
 identifier: TOKEN_IDENTIFIER {
-	$$ = yytext;
+	char *id = malloc(sizeof(char) * 256);
+	strcpy(id,yytext);
+	$$ = id;
 };
 %%
 
 int yyerror(char *str) {
 	printf("parse error: %s\n",str);
+	return 1;
 }

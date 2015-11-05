@@ -56,7 +56,13 @@ false { return TOKEN_FALSE; }
 {DIGIT}+ { return TOKEN_INTEGER_LITERAL; }
 "\"\"" { return TOKEN_STRING_LITERAL; }
 \"{LEGALSTRING}+\" { return TOKEN_STRING_LITERAL; }
-({LETTER}|_)({LETTER}|{DIGIT}|_)*	{ return TOKEN_IDENTIFIER; }
+({LETTER}|_)({LETTER}|{DIGIT}|_)*	{ 
+	if (strlen(yytext) > 255 ) {
+		fprintf(stderr,"scan error: %s is too long to be a valid identifier.\n",yytext);
+		exit(1);
+	}
+	return TOKEN_IDENTIFIER;
+}
 [ \t\n\r] {}
 . {
 	fprintf(stderr,"scan error: %s is not a valid symbol.\n",yytext);

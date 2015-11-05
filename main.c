@@ -5,6 +5,8 @@ extern FILE *yyin;
 extern char *yytext;
 extern int yyparse();
 extern double parser_result;
+extern token_t yylex();
+extern void convertString(char *);
 
 int scan(char *filename);
 int parse(char *filename);
@@ -46,10 +48,10 @@ int scan(char *filename) {
                         convertString(string);
                         printf(" %s", string);
                 }
-                if ( t == TOKEN_IDENTIFIER && strlen(yytext) > 255 ) {
+                /*if ( t == TOKEN_IDENTIFIER && strlen(yytext) > 255 ) {
                         fprintf(stderr,"scan error: %s is too long to be a valid identifier.\n",yytext);
                         exit(1);
-                }
+                }*/
                 printf("\n");
         }
         fclose(yyin);
@@ -57,10 +59,22 @@ int scan(char *filename) {
 }
 
 int parse(char *filename) {
+	yyin = fopen(filename,"r");
+	if (!yyin) {
+		fprintf(stderr,"unable to open %s\n",filename);
+		exit(1);
+	}
+	while(yyin) {
+		token_t t = yylex();
+		if(!t)
+			break;
+		//if ( t == 
+	}
 	/*if(yyparse() == 0){
 		return 0;
 	} else {
 		printf("Parse Failed!\n");
 		return 1;
 	}*/
+	return 0;
 }
