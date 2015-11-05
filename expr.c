@@ -3,6 +3,7 @@
 #include <string.h>
 
 struct expr *expr_create( expr_t kind, struct expr *left, struct expr *right ) {
+	printf("EXPR_CREATE\n");
 	struct expr *expr = malloc(sizeof(struct expr));
 	expr -> kind = kind;
 	expr -> left = left;
@@ -51,4 +52,97 @@ struct expr * expr_create_string_literal( const char *str ) {
 
 /*Still to be implemented*/
 void expr_print(struct expr *e) {
+	printf("EXPR_PRINT\n");
+	if(!e)
+		return;
+	expr_print(e -> left);
+	expr_pretty_print(e);
+	expr_print(e->right);
+	if (e->kind == EXPR_FUNC)
+		printf(")");
+}
+
+void expr_pretty_print(struct expr *e) {
+	if (!e)
+		return;
+	switch(e->kind) {
+		case EXPR_ADD:
+			printf("+");
+			break;
+		case EXPR_SUB:
+			printf("-");
+			break;
+		case EXPR_MUL:
+			printf("*");
+			break;
+		case EXPR_DIV:
+			printf("/");
+			break;
+		case EXPR_MOD:
+			printf("%%");
+			break;
+		case EXPR_AND:
+			printf("&&");
+			break;
+		case EXPR_OR:
+			printf("||");
+			break;
+		case EXPR_NOT:
+			printf("!");
+			break;
+		case EXPR_LT:
+			printf("<");
+			break;
+		case EXPR_LE:
+			printf("<=");
+			break;
+		case EXPR_GT:
+			printf(">");
+			break;
+		case EXPR_GE:
+			printf(">=");
+			break;
+		case EXPR_EQ:
+			printf("==");
+			break;
+		case EXPR_NE:
+			printf("!=");
+			break;
+		case EXPR_EXPON:
+			printf("^");
+			break;
+		case EXPR_INCR:
+			printf("++");
+			break;
+		case EXPR_DECR:
+			printf("--");
+			break;
+		case EXPR_NEG:
+			printf("-");
+			break;
+		case EXPR_FUNC:
+			printf("(");
+			break;
+		case EXPR_LIST:
+			printf(",");
+			break;
+		case EXPR_NAME:
+			printf("%s",e->name);
+			break;
+		case EXPR_BOOLEAN_LITERAL:
+			if(e->literal_value == 1)
+				printf("true");
+			else
+				printf("false");
+			break;
+		case EXPR_INTEGER_LITERAL:
+			printf("%i",e->literal_value);
+			break;
+		case EXPR_CHARACTER_LITERAL:
+			printf("%c",e->literal_value);
+			break;
+		case EXPR_STRING_LITERAL:
+			printf("%s",e->string_literal);
+			break;
+	}
 }

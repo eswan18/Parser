@@ -1047,22 +1047,34 @@ YY_RULE_SETUP
 case 48:
 YY_RULE_SETUP
 #line 58 "scanner.l"
-{ return TOKEN_STRING_LITERAL; }
+{ 
+	if (strlen(yytext) > 255 ) {
+		fprintf(stderr,"scan error: %s is too long to be a valid string literal.\n",yytext);
+		exit(1);
+	}
+	return TOKEN_STRING_LITERAL;
+}
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 59 "scanner.l"
-{ return TOKEN_IDENTIFIER; }
+#line 65 "scanner.l"
+{ 
+	if (strlen(yytext) > 255 ) {
+		fprintf(stderr,"scan error: %s is too long to be a valid identifier.\n",yytext);
+		exit(1);
+	}
+	return TOKEN_IDENTIFIER;
+}
 	YY_BREAK
 case 50:
 /* rule 50 can match eol */
 YY_RULE_SETUP
-#line 60 "scanner.l"
+#line 72 "scanner.l"
 {}
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 61 "scanner.l"
+#line 73 "scanner.l"
 {
 	fprintf(stderr,"scan error: %s is not a valid symbol.\n",yytext);
 	exit(1);
@@ -1070,10 +1082,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 66 "scanner.l"
+#line 78 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 1077 "lex.yy.c"
+#line 1089 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2071,7 +2083,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 66 "scanner.l"
+#line 78 "scanner.l"
 
 
 

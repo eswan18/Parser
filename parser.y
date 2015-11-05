@@ -43,7 +43,6 @@
 %token TOKEN_INTEGER_LITERAL
 %token TOKEN_STRING_LITERAL
 %token TOKEN_IDENTIFIER
-
 %{
 #include <stdio.h>
 #include <string.h>
@@ -66,7 +65,7 @@ extern int yyerror( char *str );
 Clunky: Keep the final result of the parse in a global variable,
 so that it can be retrieved by main().
 */
-double parser_result = 0.0;
+struct decl *parser_result = 0;
 %}
 
 %%
@@ -90,7 +89,10 @@ double parser_result = 0.0;
 %type <integer> integer_literal char_literal;
 
 
-program: decl_list
+program: decl_list {
+	parser_result = $1;
+	return 0;
+}
 	;
 
 decl_list: decl decl_list {
@@ -312,25 +314,25 @@ primary_expr: identifier {
 	;
 
 type: integer {
-	type_create(TYPE_INTEGER,0,0);
+	$$ = type_create(TYPE_INTEGER,0,0);
 }
 	| void {
-	type_create(TYPE_VOID,0,0);
+	$$ = type_create(TYPE_VOID,0,0);
 }
 	| string {
-	type_create(TYPE_STRING,0,0);
+	$$ = type_create(TYPE_STRING,0,0);
 }
 	| char {
-	type_create(TYPE_CHARACTER,0,0);
+	$$ = type_create(TYPE_CHARACTER,0,0);
 }
 	| boolean {
-	type_create(TYPE_BOOLEAN,0,0);
+	$$ = type_create(TYPE_BOOLEAN,0,0);
 }
 	| array left_bracket opt_expr right_bracket type {
-	type_create(TYPE_ARRAY,0,$5);
+	$$ = type_create(TYPE_ARRAY,0,$5);
 }
 	| function type left_paren param_list right_paren {
-	type_create(TYPE_FUNCTION,$4,$2);
+	$$ = type_create(TYPE_FUNCTION,$4,$2);
 }
 	;
 
@@ -355,7 +357,7 @@ param:	type colon identifier {
 }
 	;
 
-/* Redefintions of terminals */
+/* Redefinitions of terminals */
 print: TOKEN_PRINT;
 function: TOKEN_FUNCTION;
 for: TOKEN_FOR;
@@ -409,13 +411,14 @@ string_literal: TOKEN_STRING_LITERAL {
 	$$ = str;
 };
 identifier: TOKEN_IDENTIFIER {
+	printf("FOUND IDENTIFIER\n");
 	char *id = malloc(sizeof(char) * 256);
 	strcpy(id,yytext);
 	$$ = id;
 };
 %%
-
 int yyerror(char *str) {
+	printf("yytext: %s\n",yytext);
 	printf("parse error: %s\n",str);
 	return 1;
 }
