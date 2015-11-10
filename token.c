@@ -1,15 +1,16 @@
 #include "token.h"
+#include "parser.tab.h"
 
-const char* token_string(token_t t) {
+const char* token_string(int t) {
 	switch(t) {
-		case TOKEN_EOF:
-			return "EOF";
+		//case TOKEN_EOF:
+		//	return "EOF";
 		case TOKEN_PRINT:
 			return "PRINT";
 		case TOKEN_FUNCTION:
 			return "FUNCTION";
-		case TOKEN_WHILE:
-			return "WHILE";
+		//case TOKEN_WHILE:
+		//	return "WHILE";
 		case TOKEN_FOR:
 			return "FOR";
 		case TOKEN_IF:
@@ -96,8 +97,8 @@ const char* token_string(token_t t) {
 			return "INTEGER_LITERAL";
 		case TOKEN_IDENTIFIER:
 			return "IDENTIFIER";
-		case TOKEN_COMMENT:
-			return "COMMENT";
+		//case TOKEN_COMMENT:
+		//	return "COMMENT";
 		default:
 			fprintf(stderr,"scan error: invalid input character\n");
 			exit(1);

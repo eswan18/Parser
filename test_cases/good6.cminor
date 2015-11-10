@@ -1,8 +1,9 @@
-"THESE ARE VALID UNUSUAL OPERATIONS"
-c % 4
-a == 'a'
-apples && oranges
-red || blue
-ten^fold
-increment++
-decrement --
+func: function () = {
+	x: integer = 1;
+	x = other_func(x) * x + 3;
+	return x;
+}
+
+other_func: function (input: integer) = {
+	return (input % 3);
+}

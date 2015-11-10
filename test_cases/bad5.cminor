@@ -1,3 +1,6 @@
-"THIS IS INVALID BECAUSE OF ILLEGAL IDENTIFIER NAMES"
+func(3, 4, 5, 10000);
 
-7_hey&
+func: function void (one: integer, two: integer, three: integer, four: integer) = {
+	one++;
+	one + two % three / four;
+}

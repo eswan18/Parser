@@ -1,7 +1,3 @@
-"THIS IS THE VALID INPUT GIVEN ON THE SCANNER ASSIGNMENT PAGE"
-string
-1534
-'a'
-Notre Dame
-"Notre\nDame";
->=
+this: function void () = {
+	return;
+}

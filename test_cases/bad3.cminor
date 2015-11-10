@@ -1,5 +1,4 @@
-"THIS IS INVALID BECAUSE THE STRING NEVER TERMINATES
-
-"hello \"
-a + b = 3
-"a"
+int main (int argc, char argv) {
+	//c code
+	return (0);
+}

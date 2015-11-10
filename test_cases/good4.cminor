@@ -1,10 +1,9 @@
-"THESE ARE VALID EXPRESSIONS"
-a = b / c
-think = know + power
-less < more
-l<m
-t=k+p
-a=b/c
-a==c
-12!=11
-
+main: function integer (argv: array, argc: integer) = {
+	i: integer = 0;
+	j: integer = 1;
+	if(i == j) {
+		print i;
+		return j;
+	}
+	return i;
+}

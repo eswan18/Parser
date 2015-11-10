@@ -1,5 +1,6 @@
 %{
 	#include "token.h"
+	#include "parser.tab.h"
 	void convertString(char *string);
 	void simplifyString(char *string);
 %}
@@ -8,11 +9,10 @@ LETTER [a-zA-Z]
 LEGALSTRING [^\n\t\r\\\"]|(\\[^\n\t\r])|(\\\")
 LEGALCOMMENT [^\*\\]|(\\\*)|(\\[^\*])
 %%
-"/*"{LEGALCOMMENT}*"*/" { return TOKEN_COMMENT; }
-"//".*\n { return TOKEN_COMMENT; }
+"/*"{LEGALCOMMENT}*"*/" { /*return TOKEN_COMMENT;*/ }
+"//".*\n { /*return TOKEN_COMMENT;*/ }
 print { return TOKEN_PRINT; }
 function { return TOKEN_FUNCTION; }
-while { return TOKEN_WHILE; }
 for { return TOKEN_FOR; }
 if { return TOKEN_IF; }
 else { return TOKEN_ELSE; }

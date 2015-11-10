@@ -1,2884 +1,2859 @@
-Grammar
-
-    0 $accept: program $end
+   0  $accept : program $end
+
+   1  program : decl_list
 
-    1 program: decl_list
+   2  decl_list : decl decl_list
+   3            | decl
 
-    2 decl_list: decl decl_list
-    3          | /* empty */
+   4  decl : identifier colon type assign expr semicolon
+   5       | identifier colon type semicolon
+   6       | identifier colon type assign left_brace stmt_list right_brace
 
-    4 decl: identifier colon type assign expr semicolon
-    5     | identifier colon type semicolon
-    6     | identifier colon type assign left_brace stmt_list right_brace
+   7  stmt : open_stmt
+   8       | closed_stmt
 
-    7 stmt: open_stmt
-    8     | closed_stmt
+   9  closed_stmt : decl
+  10              | expr semicolon
+  11              | return opt_expr semicolon
+  12              | print expr_list semicolon
+  13              | for left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren closed_stmt
+  14              | if left_paren expr right_paren closed_stmt else closed_stmt
+  15              | left_brace stmt_list right_brace
 
-    9 closed_stmt: decl
-   10            | expr semicolon
-   11            | return opt_expr semicolon
-   12            | print expr_list semicolon
-   13            | for left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren closed_stmt
-   14            | if left_paren expr right_paren closed_stmt else closed_stmt
-   15            | left_brace stmt_list right_brace
+  16  open_stmt : if left_paren expr right_paren stmt
+  17            | if left_paren expr right_paren closed_stmt else open_stmt
+  18            | for left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren open_stmt
 
-   16 open_stmt: if left_paren expr right_paren stmt
-   17          | if left_paren expr right_paren closed_stmt else open_stmt
-   18          | for left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren open_stmt
+  19  stmt_list : not_empty_stmt_list
+  20            |
 
-   19 stmt_list: not_empty_stmt_list
-   20          | /* empty */
+  21  not_empty_stmt_list : stmt not_empty_stmt_list
+  22                      | stmt
 
-   21 not_empty_stmt_list: stmt not_empty_stmt_list
-   22                    | stmt
+  23  expr : expr and compare_expr
+  24       | expr or compare_expr
+  25       | compare_expr
 
-   23 expr: expr add primary_expr
-   24     | expr subtract primary_expr
-   25     | expr multiply primary_expr
-   26     | expr divide primary_expr
-   27     | expr eq primary_expr
-   28     | expr ne primary_expr
-   29     | expr gt primary_expr
-   30     | expr ge primary_expr
-   31     | expr lt primary_expr
-   32     | expr le primary_expr
-   33     | expr and primary_expr
-   34     | expr or primary_expr
-   35     | not primary_expr
-   36     | expr increment
-   37     | expr decrement
-   38     | expr modulus primary_expr
-   39     | expr exponentiate primary_expr
-   40     | subtract primary_expr
-   41     | primary_expr
+  26  compare_expr : add_expr ne add_expr
+  27               | add_expr gt add_expr
+  28               | add_expr ge add_expr
+  29               | add_expr lt add_expr
+  30               | add_expr le add_expr
+  31               | add_expr eq add_expr
+  32               | add_expr
 
-   42 opt_expr: expr
-   43         | /* empty */
+  33  add_expr : add_expr add mul_expr
+  34           | add_expr subtract mul_expr
+  35           | mul_expr
 
-   44 expr_list: not_empty_expr_list
-   45          | /* empty */
+  36  mul_expr : mul_expr multiply expon_expr
+  37           | mul_expr divide expon_expr
+  38           | mul_expr modulus expon_expr
+  39           | expon_expr
 
-   46 not_empty_expr_list: expr comma not_empty_expr_list
-   47                    | expr
+  40  expon_expr : neg_expr exponentiate expon_expr
+  41             | neg_expr
 
-   48 primary_expr: identifier opt_parenthetical_expr_list
-   49             | integer_literal
-   50             | string_literal
-   51             | char_literal
-   52             | true
-   53             | false
-   54             | left_paren expr right_paren
-   55             | left_brace not_empty_expr_list right_brace
+  42  neg_expr : subtract incr_expr
+  43           | not incr_expr
+  44           | incr_expr
 
-   56 opt_parenthetical_expr_list: left_paren expr_list right_paren
-   57                            | /* empty */
+  45  incr_expr : primary_expr increment
+  46            | primary_expr decrement
+  47            | primary_expr
 
-   58 type: integer
-   59     | void
-   60     | string
-   61     | char
-   62     | boolean
-   63     | array left_bracket opt_expr right_bracket type
-   64     | function type left_paren param_list right_paren
+  48  opt_expr : expr
+  49           |
 
-   65 param_list: not_empty_param_list
-   66           | /* empty */
+  50  expr_list : not_empty_expr_list
+  51            |
 
-   67 not_empty_param_list: param
-   68                     | param comma not_empty_param_list
+  52  not_empty_expr_list : expr comma not_empty_expr_list
+  53                      | expr
 
-   69 param: identifier
+  54  primary_expr : identifier
+  55               | identifier left_paren expr_list right_paren
+  56               | integer_literal
+  57               | string_literal
+  58               | char_literal
+  59               | true
+  60               | false
+  61               | left_paren expr right_paren
+  62               | left_brace not_empty_expr_list right_brace
 
-   70 print: TOKEN_PRINT
+  63  type : integer
+  64       | void
+  65       | string
+  66       | char
+  67       | boolean
+  68       | array left_bracket opt_expr right_bracket type
+  69       | function type left_paren param_list right_paren
 
-   71 function: TOKEN_FUNCTION
+  70  param_list : not_empty_param_list
+  71             |
 
-   72 for: TOKEN_FOR
+  72  not_empty_param_list : param
+  73                       | param comma not_empty_param_list
 
-   73 if: TOKEN_IF
+  74  param : type colon identifier
 
-   74 else: TOKEN_ELSE
+  75  print : TOKEN_PRINT
 
-   75 return: TOKEN_RETURN
+  76  function : TOKEN_FUNCTION
 
-   76 left_brace: TOKEN_LEFT_BRACE
+  77  for : TOKEN_FOR
 
-   77 right_brace: TOKEN_RIGHT_BRACE
+  78  if : TOKEN_IF
 
-   78 left_paren: TOKEN_LEFT_PAREN
+  79  else : TOKEN_ELSE
 
-   79 right_paren: TOKEN_RIGHT_PAREN
+  80  return : TOKEN_RETURN
 
-   80 left_bracket: TOKEN_LEFT_BRACKET
+  81  left_brace : TOKEN_LEFT_BRACE
 
-   81 right_bracket: TOKEN_RIGHT_BRACKET
+  82  right_brace : TOKEN_RIGHT_BRACE
 
-   82 string: TOKEN_STRING
+  83  left_paren : TOKEN_LEFT_PAREN
 
-   83 integer: TOKEN_INTEGER
+  84  right_paren : TOKEN_RIGHT_PAREN
 
-   84 char: TOKEN_CHAR
+  85  left_bracket : TOKEN_LEFT_BRACKET
 
-   85 void: TOKEN_VOID
+  86  right_bracket : TOKEN_RIGHT_BRACKET
 
-   86 boolean: TOKEN_BOOLEAN
+  87  string : TOKEN_STRING
 
-   87 array: TOKEN_ARRAY
+  88  integer : TOKEN_INTEGER
 
-   88 ge: TOKEN_GE
+  89  char : TOKEN_CHAR
 
-   89 le: TOKEN_LE
+  90  void : TOKEN_VOID
 
-   90 eq: TOKEN_EQ
+  91  boolean : TOKEN_BOOLEAN
 
-   91 ne: TOKEN_NE
+  92  array : TOKEN_ARRAY
 
-   92 lt: TOKEN_LT
+  93  ge : TOKEN_GE
 
-   93 gt: TOKEN_GT
+  94  le : TOKEN_LE
 
-   94 and: TOKEN_AND
+  95  eq : TOKEN_EQ
 
-   95 or: TOKEN_OR
+  96  ne : TOKEN_NE
 
-   96 not: TOKEN_NOT
+  97  lt : TOKEN_LT
 
-   97 increment: TOKEN_INCREMENT
+  98  gt : TOKEN_GT
 
-   98 decrement: TOKEN_DECREMENT
+  99  and : TOKEN_AND
 
-   99 add: TOKEN_ADD
+ 100  or : TOKEN_OR
 
-  100 subtract: TOKEN_SUBTRACT
+ 101  not : TOKEN_NOT
 
-  101 multiply: TOKEN_MULTIPLY
+ 102  increment : TOKEN_INCREMENT
 
-  102 divide: TOKEN_DIVIDE
+ 103  decrement : TOKEN_DECREMENT
 
-  103 modulus: TOKEN_MODULUS
+ 104  add : TOKEN_ADD
 
-  104 exponentiate: TOKEN_EXPONENTIATE
+ 105  subtract : TOKEN_SUBTRACT
 
-  105 assign: TOKEN_ASSIGN
+ 106  multiply : TOKEN_MULTIPLY
 
-  106 comma: TOKEN_COMMA
+ 107  divide : TOKEN_DIVIDE
 
-  107 colon: TOKEN_COLON
+ 108  modulus : TOKEN_MODULUS
 
-  108 semicolon: TOKEN_SEMICOLON
+ 109  exponentiate : TOKEN_EXPONENTIATE
 
-  109 true: TOKEN_TRUE
+ 110  assign : TOKEN_ASSIGN
 
-  110 false: TOKEN_FALSE
+ 111  comma : TOKEN_COMMA
 
-  111 char_literal: TOKEN_CHAR_LITERAL
+ 112  colon : TOKEN_COLON
 
-  112 integer_literal: TOKEN_INTEGER_LITERAL
+ 113  semicolon : TOKEN_SEMICOLON
 
-  113 string_literal: TOKEN_STRING_LITERAL
+ 114  true : TOKEN_TRUE
 
-  114 identifier: TOKEN_IDENTIFIER
+ 115  false : TOKEN_FALSE
 
+ 116  char_literal : TOKEN_CHAR_LITERAL
 
-Terminals, with rules where they appear
+ 117  integer_literal : TOKEN_INTEGER_LITERAL
 
-$end (0) 0
-error (256)
-TOKEN_PRINT (258) 70
-TOKEN_FUNCTION (259) 71
-TOKEN_FOR (260) 72
-TOKEN_IF (261) 73
-TOKEN_ELSE (262) 74
-TOKEN_RETURN (263) 75
-TOKEN_LEFT_BRACE (264) 76
-TOKEN_RIGHT_BRACE (265) 77
-TOKEN_LEFT_PAREN (266) 78
-TOKEN_RIGHT_PAREN (267) 79
-TOKEN_LEFT_BRACKET (268) 80
-TOKEN_RIGHT_BRACKET (269) 81
-TOKEN_STRING (270) 82
-TOKEN_INTEGER (271) 83
-TOKEN_CHAR (272) 84
-TOKEN_VOID (273) 85
-TOKEN_BOOLEAN (274) 86
-TOKEN_ARRAY (275) 87
-TOKEN_GE (276) 88
-TOKEN_LE (277) 89
-TOKEN_EQ (278) 90
-TOKEN_NE (279) 91
-TOKEN_LT (280) 92
-TOKEN_GT (281) 93
-TOKEN_AND (282) 94
-TOKEN_OR (283) 95
-TOKEN_NOT (284) 96
-TOKEN_INCREMENT (285) 97
-TOKEN_DECREMENT (286) 98
-TOKEN_ADD (287) 99
-TOKEN_SUBTRACT (288) 100
-TOKEN_MULTIPLY (289) 101
-TOKEN_DIVIDE (290) 102
-TOKEN_MODULUS (291) 103
-TOKEN_EXPONENTIATE (292) 104
-TOKEN_ASSIGN (293) 105
-TOKEN_COMMA (294) 106
-TOKEN_COLON (295) 107
-TOKEN_SEMICOLON (296) 108
-TOKEN_TRUE (297) 109
-TOKEN_FALSE (298) 110
-TOKEN_CHAR_LITERAL (299) 111
-TOKEN_INTEGER_LITERAL (300) 112
-TOKEN_STRING_LITERAL (301) 113
-TOKEN_IDENTIFIER (302) 114
-
-
-Nonterminals, with rules where they appear
-
-$accept (48)
-    on left: 0
-program (49)
-    on left: 1, on right: 0
-decl_list (50)
-    on left: 2 3, on right: 1 2
-decl (51)
-    on left: 4 5 6, on right: 2 9
-stmt (52)
-    on left: 7 8, on right: 16 21 22
-closed_stmt (53)
-    on left: 9 10 11 12 13 14 15, on right: 8 13 14 17
-open_stmt (54)
-    on left: 16 17 18, on right: 7 17 18
-stmt_list (55)
-    on left: 19 20, on right: 6 15
-not_empty_stmt_list (56)
-    on left: 21 22, on right: 19 21
-expr (57)
-    on left: 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40
-    41, on right: 4 10 14 16 17 23 24 25 26 27 28 29 30 31 32 33 34
-    36 37 38 39 42 46 47 54
-opt_expr (58)
-    on left: 42 43, on right: 11 13 18 63
-expr_list (59)
-    on left: 44 45, on right: 12 56
-not_empty_expr_list (60)
-    on left: 46 47, on right: 44 46 55
-primary_expr (61)
-    on left: 48 49 50 51 52 53 54 55, on right: 23 24 25 26 27 28 29
-    30 31 32 33 34 35 38 39 40 41
-opt_parenthetical_expr_list (62)
-    on left: 56 57, on right: 48
-type (63)
-    on left: 58 59 60 61 62 63 64, on right: 4 5 6 63 64
-param_list (64)
-    on left: 65 66, on right: 64
-not_empty_param_list (65)
-    on left: 67 68, on right: 65 68
-param (66)
-    on left: 69, on right: 67 68
-print (67)
-    on left: 70, on right: 12
-function (68)
-    on left: 71, on right: 64
-for (69)
-    on left: 72, on right: 13 18
-if (70)
-    on left: 73, on right: 14 16 17
-else (71)
-    on left: 74, on right: 14 17
-return (72)
-    on left: 75, on right: 11
-left_brace (73)
-    on left: 76, on right: 6 15 55
-right_brace (74)
-    on left: 77, on right: 6 15 55
-left_paren (75)
-    on left: 78, on right: 13 14 16 17 18 54 56 64
-right_paren (76)
-    on left: 79, on right: 13 14 16 17 18 54 56 64
-left_bracket (77)
-    on left: 80, on right: 63
-right_bracket (78)
-    on left: 81, on right: 63
-string (79)
-    on left: 82, on right: 60
-integer (80)
-    on left: 83, on right: 58
-char (81)
-    on left: 84, on right: 61
-void (82)
-    on left: 85, on right: 59
-boolean (83)
-    on left: 86, on right: 62
-array (84)
-    on left: 87, on right: 63
-ge (85)
-    on left: 88, on right: 30
-le (86)
-    on left: 89, on right: 32
-eq (87)
-    on left: 90, on right: 27
-ne (88)
-    on left: 91, on right: 28
-lt (89)
-    on left: 92, on right: 31
-gt (90)
-    on left: 93, on right: 29
-and (91)
-    on left: 94, on right: 33
-or (92)
-    on left: 95, on right: 34
-not (93)
-    on left: 96, on right: 35
-increment (94)
-    on left: 97, on right: 36
-decrement (95)
-    on left: 98, on right: 37
-add (96)
-    on left: 99, on right: 23
-subtract (97)
-    on left: 100, on right: 24 40
-multiply (98)
-    on left: 101, on right: 25
-divide (99)
-    on left: 102, on right: 26
-modulus (100)
-    on left: 103, on right: 38
-exponentiate (101)
-    on left: 104, on right: 39
-assign (102)
-    on left: 105, on right: 4 6
-comma (103)
-    on left: 106, on right: 46 68
-colon (104)
-    on left: 107, on right: 4 5 6
-semicolon (105)
-    on left: 108, on right: 4 5 10 11 12 13 18
-true (106)
-    on left: 109, on right: 52
-false (107)
-    on left: 110, on right: 53
-char_literal (108)
-    on left: 111, on right: 51
-integer_literal (109)
-    on left: 112, on right: 49
-string_literal (110)
-    on left: 113, on right: 50
-identifier (111)
-    on left: 114, on right: 4 5 6 48 69
+ 118  string_literal : TOKEN_STRING_LITERAL
 
-
+ 119  identifier : TOKEN_IDENTIFIER
+
 state 0
+	$accept : . program $end  (0)
 
-    0 $accept: . program $end
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    TOKEN_IDENTIFIER  shift, and go to state 1
-
-    $default  reduce using rule 3 (decl_list)
-
-    program     go to state 2
-    decl_list   go to state 3
-    decl        go to state 4
-    identifier  go to state 5
+	program  goto 2
+	decl_list  goto 3
+	decl  goto 4
+	identifier  goto 5
 
 
 state 1
+	identifier : TOKEN_IDENTIFIER .  (119)
 
-  114 identifier: TOKEN_IDENTIFIER .
-
-    $default  reduce using rule 114 (identifier)
+	.  reduce 119
 
 
 state 2
+	$accept : program . $end  (0)
 
-    0 $accept: program . $end
-
-    $end  shift, and go to state 6
+	$end  accept
 
 
 state 3
+	program : decl_list .  (1)
 
-    1 program: decl_list .
-
-    $default  reduce using rule 1 (program)
+	.  reduce 1
 
 
 state 4
+	decl_list : decl . decl_list  (2)
+	decl_list : decl .  (3)
 
-    2 decl_list: decl . decl_list
+	TOKEN_IDENTIFIER  shift 1
+	$end  reduce 3
 
-    TOKEN_IDENTIFIER  shift, and go to state 1
-
-    $default  reduce using rule 3 (decl_list)
-
-    decl_list   go to state 7
-    decl        go to state 4
-    identifier  go to state 5
+	decl_list  goto 6
+	decl  goto 4
+	identifier  goto 5
 
 
 state 5
+	decl : identifier . colon type assign expr semicolon  (4)
+	decl : identifier . colon type semicolon  (5)
+	decl : identifier . colon type assign left_brace stmt_list right_brace  (6)
 
-    4 decl: identifier . colon type assign expr semicolon
-    5     | identifier . colon type semicolon
-    6     | identifier . colon type assign left_brace stmt_list right_brace
+	TOKEN_COLON  shift 7
+	.  error
 
-    TOKEN_COLON  shift, and go to state 8
-
-    colon  go to state 9
+	colon  goto 8
 
 
 state 6
+	decl_list : decl decl_list .  (2)
 
-    0 $accept: program $end .
-
-    $default  accept
+	.  reduce 2
 
 
 state 7
+	colon : TOKEN_COLON .  (112)
 
-    2 decl_list: decl decl_list .
-
-    $default  reduce using rule 2 (decl_list)
+	.  reduce 112
 
 
 state 8
+	decl : identifier colon . type assign expr semicolon  (4)
+	decl : identifier colon . type semicolon  (5)
+	decl : identifier colon . type assign left_brace stmt_list right_brace  (6)
 
-  107 colon: TOKEN_COLON .
+	TOKEN_FUNCTION  shift 9
+	TOKEN_STRING  shift 10
+	TOKEN_INTEGER  shift 11
+	TOKEN_CHAR  shift 12
+	TOKEN_VOID  shift 13
+	TOKEN_BOOLEAN  shift 14
+	TOKEN_ARRAY  shift 15
+	.  error
 
-    $default  reduce using rule 107 (colon)
+	type  goto 16
+	integer  goto 17
+	void  goto 18
+	string  goto 19
+	char  goto 20
+	boolean  goto 21
+	array  goto 22
+	function  goto 23
 
 
 state 9
+	function : TOKEN_FUNCTION .  (76)
 
-    4 decl: identifier colon . type assign expr semicolon
-    5     | identifier colon . type semicolon
-    6     | identifier colon . type assign left_brace stmt_list right_brace
-
-    TOKEN_FUNCTION  shift, and go to state 10
-    TOKEN_STRING    shift, and go to state 11
-    TOKEN_INTEGER   shift, and go to state 12
-    TOKEN_CHAR      shift, and go to state 13
-    TOKEN_VOID      shift, and go to state 14
-    TOKEN_BOOLEAN   shift, and go to state 15
-    TOKEN_ARRAY     shift, and go to state 16
-
-    type      go to state 17
-    function  go to state 18
-    string    go to state 19
-    integer   go to state 20
-    char      go to state 21
-    void      go to state 22
-    boolean   go to state 23
-    array     go to state 24
+	.  reduce 76
 
 
 state 10
+	string : TOKEN_STRING .  (87)
 
-   71 function: TOKEN_FUNCTION .
-
-    $default  reduce using rule 71 (function)
+	.  reduce 87
 
 
 state 11
+	integer : TOKEN_INTEGER .  (88)
 
-   82 string: TOKEN_STRING .
-
-    $default  reduce using rule 82 (string)
+	.  reduce 88
 
 
 state 12
+	char : TOKEN_CHAR .  (89)
 
-   83 integer: TOKEN_INTEGER .
-
-    $default  reduce using rule 83 (integer)
+	.  reduce 89
 
 
 state 13
+	void : TOKEN_VOID .  (90)
 
-   84 char: TOKEN_CHAR .
-
-    $default  reduce using rule 84 (char)
+	.  reduce 90
 
 
 state 14
+	boolean : TOKEN_BOOLEAN .  (91)
 
-   85 void: TOKEN_VOID .
-
-    $default  reduce using rule 85 (void)
+	.  reduce 91
 
 
 state 15
+	array : TOKEN_ARRAY .  (92)
 
-   86 boolean: TOKEN_BOOLEAN .
-
-    $default  reduce using rule 86 (boolean)
+	.  reduce 92
 
 
 state 16
+	decl : identifier colon type . assign expr semicolon  (4)
+	decl : identifier colon type . semicolon  (5)
+	decl : identifier colon type . assign left_brace stmt_list right_brace  (6)
 
-   87 array: TOKEN_ARRAY .
+	TOKEN_ASSIGN  shift 24
+	TOKEN_SEMICOLON  shift 25
+	.  error
 
-    $default  reduce using rule 87 (array)
+	assign  goto 26
+	semicolon  goto 27
 
 
 state 17
+	type : integer .  (63)
 
-    4 decl: identifier colon type . assign expr semicolon
-    5     | identifier colon type . semicolon
-    6     | identifier colon type . assign left_brace stmt_list right_brace
-
-    TOKEN_ASSIGN     shift, and go to state 25
-    TOKEN_SEMICOLON  shift, and go to state 26
-
-    assign     go to state 27
-    semicolon  go to state 28
+	.  reduce 63
 
 
 state 18
+	type : void .  (64)
 
-   64 type: function . type left_paren param_list right_paren
-
-    TOKEN_FUNCTION  shift, and go to state 10
-    TOKEN_STRING    shift, and go to state 11
-    TOKEN_INTEGER   shift, and go to state 12
-    TOKEN_CHAR      shift, and go to state 13
-    TOKEN_VOID      shift, and go to state 14
-    TOKEN_BOOLEAN   shift, and go to state 15
-    TOKEN_ARRAY     shift, and go to state 16
-
-    type      go to state 29
-    function  go to state 18
-    string    go to state 19
-    integer   go to state 20
-    char      go to state 21
-    void      go to state 22
-    boolean   go to state 23
-    array     go to state 24
+	.  reduce 64
 
 
 state 19
+	type : string .  (65)
 
-   60 type: string .
-
-    $default  reduce using rule 60 (type)
+	.  reduce 65
 
 
 state 20
+	type : char .  (66)
 
-   58 type: integer .
-
-    $default  reduce using rule 58 (type)
+	.  reduce 66
 
 
 state 21
+	type : boolean .  (67)
 
-   61 type: char .
-
-    $default  reduce using rule 61 (type)
+	.  reduce 67
 
 
 state 22
+	type : array . left_bracket opt_expr right_bracket type  (68)
 
-   59 type: void .
+	TOKEN_LEFT_BRACKET  shift 28
+	.  error
 
-    $default  reduce using rule 59 (type)
+	left_bracket  goto 29
 
 
 state 23
+	type : function . type left_paren param_list right_paren  (69)
 
-   62 type: boolean .
+	TOKEN_FUNCTION  shift 9
+	TOKEN_STRING  shift 10
+	TOKEN_INTEGER  shift 11
+	TOKEN_CHAR  shift 12
+	TOKEN_VOID  shift 13
+	TOKEN_BOOLEAN  shift 14
+	TOKEN_ARRAY  shift 15
+	.  error
 
-    $default  reduce using rule 62 (type)
+	type  goto 30
+	integer  goto 17
+	void  goto 18
+	string  goto 19
+	char  goto 20
+	boolean  goto 21
+	array  goto 22
+	function  goto 23
 
 
 state 24
+	assign : TOKEN_ASSIGN .  (110)
 
-   63 type: array . left_bracket opt_expr right_bracket type
-
-    TOKEN_LEFT_BRACKET  shift, and go to state 30
-
-    left_bracket  go to state 31
+	.  reduce 110
 
 
 state 25
+	semicolon : TOKEN_SEMICOLON .  (113)
 
-  105 assign: TOKEN_ASSIGN .
-
-    $default  reduce using rule 105 (assign)
+	.  reduce 113
 
 
 state 26
+	decl : identifier colon type assign . expr semicolon  (4)
+	decl : identifier colon type assign . left_brace stmt_list right_brace  (6)
 
-  108 semicolon: TOKEN_SEMICOLON .
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    $default  reduce using rule 108 (semicolon)
+	expr  goto 40
+	compare_expr  goto 41
+	add_expr  goto 42
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 52
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 27
+	decl : identifier colon type semicolon .  (5)
 
-    4 decl: identifier colon type assign . expr semicolon
-    6     | identifier colon type assign . left_brace stmt_list right_brace
-
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_NOT              shift, and go to state 34
-    TOKEN_SUBTRACT         shift, and go to state 35
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    expr             go to state 41
-    primary_expr     go to state 42
-    left_brace       go to state 43
-    left_paren       go to state 44
-    not              go to state 45
-    subtract         go to state 46
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	.  reduce 5
 
 
 state 28
+	left_bracket : TOKEN_LEFT_BRACKET .  (85)
 
-    5 decl: identifier colon type semicolon .
-
-    $default  reduce using rule 5 (decl)
+	.  reduce 85
 
 
 state 29
+	type : array left_bracket . opt_expr right_bracket type  (68)
+	opt_expr : .  (49)
 
-   64 type: function type . left_paren param_list right_paren
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	TOKEN_RIGHT_BRACKET  reduce 49
 
-    TOKEN_LEFT_PAREN  shift, and go to state 33
-
-    left_paren  go to state 53
+	expr  goto 58
+	compare_expr  goto 41
+	add_expr  goto 42
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	opt_expr  goto 59
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 30
+	type : function type . left_paren param_list right_paren  (69)
 
-   80 left_bracket: TOKEN_LEFT_BRACKET .
+	TOKEN_LEFT_PAREN  shift 32
+	.  error
 
-    $default  reduce using rule 80 (left_bracket)
+	left_paren  goto 61
 
 
 state 31
+	left_brace : TOKEN_LEFT_BRACE .  (81)
 
-   63 type: array left_bracket . opt_expr right_bracket type
-
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_NOT              shift, and go to state 34
-    TOKEN_SUBTRACT         shift, and go to state 35
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    $default  reduce using rule 43 (opt_expr)
-
-    expr             go to state 54
-    opt_expr         go to state 55
-    primary_expr     go to state 42
-    left_brace       go to state 56
-    left_paren       go to state 44
-    not              go to state 45
-    subtract         go to state 46
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	.  reduce 81
 
 
 state 32
+	left_paren : TOKEN_LEFT_PAREN .  (83)
 
-   76 left_brace: TOKEN_LEFT_BRACE .
-
-    $default  reduce using rule 76 (left_brace)
+	.  reduce 83
 
 
 state 33
+	not : TOKEN_NOT .  (101)
 
-   78 left_paren: TOKEN_LEFT_PAREN .
-
-    $default  reduce using rule 78 (left_paren)
+	.  reduce 101
 
 
 state 34
+	subtract : TOKEN_SUBTRACT .  (105)
 
-   96 not: TOKEN_NOT .
-
-    $default  reduce using rule 96 (not)
+	.  reduce 105
 
 
 state 35
+	true : TOKEN_TRUE .  (114)
 
-  100 subtract: TOKEN_SUBTRACT .
-
-    $default  reduce using rule 100 (subtract)
+	.  reduce 114
 
 
 state 36
+	false : TOKEN_FALSE .  (115)
 
-  109 true: TOKEN_TRUE .
-
-    $default  reduce using rule 109 (true)
+	.  reduce 115
 
 
 state 37
+	char_literal : TOKEN_CHAR_LITERAL .  (116)
 
-  110 false: TOKEN_FALSE .
-
-    $default  reduce using rule 110 (false)
+	.  reduce 116
 
 
 state 38
+	integer_literal : TOKEN_INTEGER_LITERAL .  (117)
 
-  111 char_literal: TOKEN_CHAR_LITERAL .
-
-    $default  reduce using rule 111 (char_literal)
+	.  reduce 117
 
 
 state 39
+	string_literal : TOKEN_STRING_LITERAL .  (118)
 
-  112 integer_literal: TOKEN_INTEGER_LITERAL .
-
-    $default  reduce using rule 112 (integer_literal)
+	.  reduce 118
 
 
 state 40
+	decl : identifier colon type assign expr . semicolon  (4)
+	expr : expr . and compare_expr  (23)
+	expr : expr . or compare_expr  (24)
 
-  113 string_literal: TOKEN_STRING_LITERAL .
+	TOKEN_AND  shift 62
+	TOKEN_OR  shift 63
+	TOKEN_SEMICOLON  shift 25
+	.  error
 
-    $default  reduce using rule 113 (string_literal)
+	semicolon  goto 64
+	and  goto 65
+	or  goto 66
 
 
 state 41
+	expr : compare_expr .  (25)
 
-    4 decl: identifier colon type assign expr . semicolon
-   23 expr: expr . add primary_expr
-   24     | expr . subtract primary_expr
-   25     | expr . multiply primary_expr
-   26     | expr . divide primary_expr
-   27     | expr . eq primary_expr
-   28     | expr . ne primary_expr
-   29     | expr . gt primary_expr
-   30     | expr . ge primary_expr
-   31     | expr . lt primary_expr
-   32     | expr . le primary_expr
-   33     | expr . and primary_expr
-   34     | expr . or primary_expr
-   36     | expr . increment
-   37     | expr . decrement
-   38     | expr . modulus primary_expr
-   39     | expr . exponentiate primary_expr
-
-    TOKEN_GE            shift, and go to state 57
-    TOKEN_LE            shift, and go to state 58
-    TOKEN_EQ            shift, and go to state 59
-    TOKEN_NE            shift, and go to state 60
-    TOKEN_LT            shift, and go to state 61
-    TOKEN_GT            shift, and go to state 62
-    TOKEN_AND           shift, and go to state 63
-    TOKEN_OR            shift, and go to state 64
-    TOKEN_INCREMENT     shift, and go to state 65
-    TOKEN_DECREMENT     shift, and go to state 66
-    TOKEN_ADD           shift, and go to state 67
-    TOKEN_SUBTRACT      shift, and go to state 35
-    TOKEN_MULTIPLY      shift, and go to state 68
-    TOKEN_DIVIDE        shift, and go to state 69
-    TOKEN_MODULUS       shift, and go to state 70
-    TOKEN_EXPONENTIATE  shift, and go to state 71
-    TOKEN_SEMICOLON     shift, and go to state 26
-
-    ge            go to state 72
-    le            go to state 73
-    eq            go to state 74
-    ne            go to state 75
-    lt            go to state 76
-    gt            go to state 77
-    and           go to state 78
-    or            go to state 79
-    increment     go to state 80
-    decrement     go to state 81
-    add           go to state 82
-    subtract      go to state 83
-    multiply      go to state 84
-    divide        go to state 85
-    modulus       go to state 86
-    exponentiate  go to state 87
-    semicolon     go to state 88
+	.  reduce 25
 
 
 state 42
+	compare_expr : add_expr . ne add_expr  (26)
+	compare_expr : add_expr . gt add_expr  (27)
+	compare_expr : add_expr . ge add_expr  (28)
+	compare_expr : add_expr . lt add_expr  (29)
+	compare_expr : add_expr . le add_expr  (30)
+	compare_expr : add_expr . eq add_expr  (31)
+	compare_expr : add_expr .  (32)
+	add_expr : add_expr . add mul_expr  (33)
+	add_expr : add_expr . subtract mul_expr  (34)
 
-   41 expr: primary_expr .
+	TOKEN_GE  shift 67
+	TOKEN_LE  shift 68
+	TOKEN_EQ  shift 69
+	TOKEN_NE  shift 70
+	TOKEN_LT  shift 71
+	TOKEN_GT  shift 72
+	TOKEN_ADD  shift 73
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_RIGHT_BRACE  reduce 32
+	TOKEN_RIGHT_PAREN  reduce 32
+	TOKEN_RIGHT_BRACKET  reduce 32
+	TOKEN_AND  reduce 32
+	TOKEN_OR  reduce 32
+	TOKEN_COMMA  reduce 32
+	TOKEN_SEMICOLON  reduce 32
 
-    $default  reduce using rule 41 (expr)
+	ne  goto 74
+	gt  goto 75
+	ge  goto 76
+	lt  goto 77
+	le  goto 78
+	eq  goto 79
+	add  goto 80
+	subtract  goto 81
 
 
 state 43
+	add_expr : mul_expr .  (35)
+	mul_expr : mul_expr . multiply expon_expr  (36)
+	mul_expr : mul_expr . divide expon_expr  (37)
+	mul_expr : mul_expr . modulus expon_expr  (38)
 
-    6 decl: identifier colon type assign left_brace . stmt_list right_brace
-   55 primary_expr: left_brace . not_empty_expr_list right_brace
+	TOKEN_MULTIPLY  shift 82
+	TOKEN_DIVIDE  shift 83
+	TOKEN_MODULUS  shift 84
+	TOKEN_RIGHT_BRACE  reduce 35
+	TOKEN_RIGHT_PAREN  reduce 35
+	TOKEN_RIGHT_BRACKET  reduce 35
+	TOKEN_GE  reduce 35
+	TOKEN_LE  reduce 35
+	TOKEN_EQ  reduce 35
+	TOKEN_NE  reduce 35
+	TOKEN_LT  reduce 35
+	TOKEN_GT  reduce 35
+	TOKEN_AND  reduce 35
+	TOKEN_OR  reduce 35
+	TOKEN_ADD  reduce 35
+	TOKEN_SUBTRACT  reduce 35
+	TOKEN_COMMA  reduce 35
+	TOKEN_SEMICOLON  reduce 35
 
-    TOKEN_PRINT            shift, and go to state 89
-    TOKEN_FOR              shift, and go to state 90
-    TOKEN_IF               shift, and go to state 91
-    TOKEN_RETURN           shift, and go to state 92
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_NOT              shift, and go to state 34
-    TOKEN_SUBTRACT         shift, and go to state 35
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    $default  reduce using rule 20 (stmt_list)
-
-    decl                 go to state 93
-    stmt                 go to state 94
-    closed_stmt          go to state 95
-    open_stmt            go to state 96
-    stmt_list            go to state 97
-    not_empty_stmt_list  go to state 98
-    expr                 go to state 99
-    not_empty_expr_list  go to state 100
-    primary_expr         go to state 42
-    print                go to state 101
-    for                  go to state 102
-    if                   go to state 103
-    return               go to state 104
-    left_brace           go to state 105
-    left_paren           go to state 44
-    not                  go to state 45
-    subtract             go to state 46
-    true                 go to state 47
-    false                go to state 48
-    char_literal         go to state 49
-    integer_literal      go to state 50
-    string_literal       go to state 51
-    identifier           go to state 106
+	multiply  goto 85
+	divide  goto 86
+	modulus  goto 87
 
 
 state 44
+	mul_expr : expon_expr .  (39)
 
-   54 primary_expr: left_paren . expr right_paren
-
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_NOT              shift, and go to state 34
-    TOKEN_SUBTRACT         shift, and go to state 35
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    expr             go to state 107
-    primary_expr     go to state 42
-    left_brace       go to state 56
-    left_paren       go to state 44
-    not              go to state 45
-    subtract         go to state 46
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	.  reduce 39
 
 
 state 45
+	expon_expr : neg_expr . exponentiate expon_expr  (40)
+	expon_expr : neg_expr .  (41)
 
-   35 expr: not . primary_expr
+	TOKEN_EXPONENTIATE  shift 88
+	TOKEN_RIGHT_BRACE  reduce 41
+	TOKEN_RIGHT_PAREN  reduce 41
+	TOKEN_RIGHT_BRACKET  reduce 41
+	TOKEN_GE  reduce 41
+	TOKEN_LE  reduce 41
+	TOKEN_EQ  reduce 41
+	TOKEN_NE  reduce 41
+	TOKEN_LT  reduce 41
+	TOKEN_GT  reduce 41
+	TOKEN_AND  reduce 41
+	TOKEN_OR  reduce 41
+	TOKEN_ADD  reduce 41
+	TOKEN_SUBTRACT  reduce 41
+	TOKEN_MULTIPLY  reduce 41
+	TOKEN_DIVIDE  reduce 41
+	TOKEN_MODULUS  reduce 41
+	TOKEN_COMMA  reduce 41
+	TOKEN_SEMICOLON  reduce 41
 
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    primary_expr     go to state 108
-    left_brace       go to state 56
-    left_paren       go to state 44
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	exponentiate  goto 89
 
 
 state 46
+	neg_expr : incr_expr .  (44)
 
-   40 expr: subtract . primary_expr
-
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    primary_expr     go to state 109
-    left_brace       go to state 56
-    left_paren       go to state 44
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	.  reduce 44
 
 
 state 47
+	incr_expr : primary_expr . increment  (45)
+	incr_expr : primary_expr . decrement  (46)
+	incr_expr : primary_expr .  (47)
 
-   52 primary_expr: true .
+	TOKEN_INCREMENT  shift 90
+	TOKEN_DECREMENT  shift 91
+	TOKEN_RIGHT_BRACE  reduce 47
+	TOKEN_RIGHT_PAREN  reduce 47
+	TOKEN_RIGHT_BRACKET  reduce 47
+	TOKEN_GE  reduce 47
+	TOKEN_LE  reduce 47
+	TOKEN_EQ  reduce 47
+	TOKEN_NE  reduce 47
+	TOKEN_LT  reduce 47
+	TOKEN_GT  reduce 47
+	TOKEN_AND  reduce 47
+	TOKEN_OR  reduce 47
+	TOKEN_ADD  reduce 47
+	TOKEN_SUBTRACT  reduce 47
+	TOKEN_MULTIPLY  reduce 47
+	TOKEN_DIVIDE  reduce 47
+	TOKEN_MODULUS  reduce 47
+	TOKEN_EXPONENTIATE  reduce 47
+	TOKEN_COMMA  reduce 47
+	TOKEN_SEMICOLON  reduce 47
 
-    $default  reduce using rule 52 (primary_expr)
+	increment  goto 92
+	decrement  goto 93
 
 
 state 48
+	primary_expr : identifier .  (54)
+	primary_expr : identifier . left_paren expr_list right_paren  (55)
 
-   53 primary_expr: false .
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_RIGHT_BRACE  reduce 54
+	TOKEN_RIGHT_PAREN  reduce 54
+	TOKEN_RIGHT_BRACKET  reduce 54
+	TOKEN_GE  reduce 54
+	TOKEN_LE  reduce 54
+	TOKEN_EQ  reduce 54
+	TOKEN_NE  reduce 54
+	TOKEN_LT  reduce 54
+	TOKEN_GT  reduce 54
+	TOKEN_AND  reduce 54
+	TOKEN_OR  reduce 54
+	TOKEN_INCREMENT  reduce 54
+	TOKEN_DECREMENT  reduce 54
+	TOKEN_ADD  reduce 54
+	TOKEN_SUBTRACT  reduce 54
+	TOKEN_MULTIPLY  reduce 54
+	TOKEN_DIVIDE  reduce 54
+	TOKEN_MODULUS  reduce 54
+	TOKEN_EXPONENTIATE  reduce 54
+	TOKEN_COMMA  reduce 54
+	TOKEN_SEMICOLON  reduce 54
 
-    $default  reduce using rule 53 (primary_expr)
+	left_paren  goto 94
 
 
 state 49
+	primary_expr : string_literal .  (57)
 
-   51 primary_expr: char_literal .
-
-    $default  reduce using rule 51 (primary_expr)
+	.  reduce 57
 
 
 state 50
+	primary_expr : integer_literal .  (56)
 
-   49 primary_expr: integer_literal .
-
-    $default  reduce using rule 49 (primary_expr)
+	.  reduce 56
 
 
 state 51
+	primary_expr : char_literal .  (58)
 
-   50 primary_expr: string_literal .
-
-    $default  reduce using rule 50 (primary_expr)
+	.  reduce 58
 
 
 state 52
+	decl : identifier colon type assign left_brace . stmt_list right_brace  (6)
+	primary_expr : left_brace . not_empty_expr_list right_brace  (62)
+	stmt_list : .  (20)
 
-   48 primary_expr: identifier . opt_parenthetical_expr_list
+	TOKEN_PRINT  shift 95
+	TOKEN_FOR  shift 96
+	TOKEN_IF  shift 97
+	TOKEN_RETURN  shift 98
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	TOKEN_RIGHT_BRACE  reduce 20
 
-    TOKEN_LEFT_PAREN  shift, and go to state 33
-
-    $default  reduce using rule 57 (opt_parenthetical_expr_list)
-
-    opt_parenthetical_expr_list  go to state 110
-    left_paren                   go to state 111
+	decl  goto 99
+	expr  goto 100
+	compare_expr  goto 41
+	add_expr  goto 42
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	not_empty_expr_list  goto 101
+	primary_expr  goto 47
+	stmt  goto 102
+	open_stmt  goto 103
+	closed_stmt  goto 104
+	stmt_list  goto 105
+	not_empty_stmt_list  goto 106
+	identifier  goto 107
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 108
+	return  goto 109
+	print  goto 110
+	for  goto 111
+	left_paren  goto 53
+	if  goto 112
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 53
+	primary_expr : left_paren . expr right_paren  (61)
 
-   64 type: function type left_paren . param_list right_paren
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    TOKEN_IDENTIFIER  shift, and go to state 1
-
-    $default  reduce using rule 66 (param_list)
-
-    param_list            go to state 112
-    not_empty_param_list  go to state 113
-    param                 go to state 114
-    identifier            go to state 115
+	expr  goto 113
+	compare_expr  goto 41
+	add_expr  goto 42
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 54
+	neg_expr : subtract . incr_expr  (42)
 
-   23 expr: expr . add primary_expr
-   24     | expr . subtract primary_expr
-   25     | expr . multiply primary_expr
-   26     | expr . divide primary_expr
-   27     | expr . eq primary_expr
-   28     | expr . ne primary_expr
-   29     | expr . gt primary_expr
-   30     | expr . ge primary_expr
-   31     | expr . lt primary_expr
-   32     | expr . le primary_expr
-   33     | expr . and primary_expr
-   34     | expr . or primary_expr
-   36     | expr . increment
-   37     | expr . decrement
-   38     | expr . modulus primary_expr
-   39     | expr . exponentiate primary_expr
-   42 opt_expr: expr .
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    TOKEN_GE            shift, and go to state 57
-    TOKEN_LE            shift, and go to state 58
-    TOKEN_EQ            shift, and go to state 59
-    TOKEN_NE            shift, and go to state 60
-    TOKEN_LT            shift, and go to state 61
-    TOKEN_GT            shift, and go to state 62
-    TOKEN_AND           shift, and go to state 63
-    TOKEN_OR            shift, and go to state 64
-    TOKEN_INCREMENT     shift, and go to state 65
-    TOKEN_DECREMENT     shift, and go to state 66
-    TOKEN_ADD           shift, and go to state 67
-    TOKEN_SUBTRACT      shift, and go to state 35
-    TOKEN_MULTIPLY      shift, and go to state 68
-    TOKEN_DIVIDE        shift, and go to state 69
-    TOKEN_MODULUS       shift, and go to state 70
-    TOKEN_EXPONENTIATE  shift, and go to state 71
-
-    $default  reduce using rule 42 (opt_expr)
-
-    ge            go to state 72
-    le            go to state 73
-    eq            go to state 74
-    ne            go to state 75
-    lt            go to state 76
-    gt            go to state 77
-    and           go to state 78
-    or            go to state 79
-    increment     go to state 80
-    decrement     go to state 81
-    add           go to state 82
-    subtract      go to state 83
-    multiply      go to state 84
-    divide        go to state 85
-    modulus       go to state 86
-    exponentiate  go to state 87
+	incr_expr  goto 114
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	true  goto 56
+	false  goto 57
 
 
 state 55
+	neg_expr : not . incr_expr  (43)
 
-   63 type: array left_bracket opt_expr . right_bracket type
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    TOKEN_RIGHT_BRACKET  shift, and go to state 116
-
-    right_bracket  go to state 117
+	incr_expr  goto 115
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	true  goto 56
+	false  goto 57
 
 
 state 56
+	primary_expr : true .  (59)
 
-   55 primary_expr: left_brace . not_empty_expr_list right_brace
-
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_NOT              shift, and go to state 34
-    TOKEN_SUBTRACT         shift, and go to state 35
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    expr                 go to state 118
-    not_empty_expr_list  go to state 100
-    primary_expr         go to state 42
-    left_brace           go to state 56
-    left_paren           go to state 44
-    not                  go to state 45
-    subtract             go to state 46
-    true                 go to state 47
-    false                go to state 48
-    char_literal         go to state 49
-    integer_literal      go to state 50
-    string_literal       go to state 51
-    identifier           go to state 52
+	.  reduce 59
 
 
 state 57
+	primary_expr : false .  (60)
 
-   88 ge: TOKEN_GE .
-
-    $default  reduce using rule 88 (ge)
+	.  reduce 60
 
 
 state 58
+	expr : expr . and compare_expr  (23)
+	expr : expr . or compare_expr  (24)
+	opt_expr : expr .  (48)
 
-   89 le: TOKEN_LE .
+	TOKEN_AND  shift 62
+	TOKEN_OR  shift 63
+	TOKEN_RIGHT_PAREN  reduce 48
+	TOKEN_RIGHT_BRACKET  reduce 48
+	TOKEN_SEMICOLON  reduce 48
 
-    $default  reduce using rule 89 (le)
+	and  goto 65
+	or  goto 66
 
 
 state 59
+	type : array left_bracket opt_expr . right_bracket type  (68)
 
-   90 eq: TOKEN_EQ .
+	TOKEN_RIGHT_BRACKET  shift 116
+	.  error
 
-    $default  reduce using rule 90 (eq)
+	right_bracket  goto 117
 
 
 state 60
+	primary_expr : left_brace . not_empty_expr_list right_brace  (62)
 
-   91 ne: TOKEN_NE .
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    $default  reduce using rule 91 (ne)
+	expr  goto 118
+	compare_expr  goto 41
+	add_expr  goto 42
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	not_empty_expr_list  goto 101
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 61
+	type : function type left_paren . param_list right_paren  (69)
+	param_list : .  (71)
 
-   92 lt: TOKEN_LT .
+	TOKEN_FUNCTION  shift 9
+	TOKEN_STRING  shift 10
+	TOKEN_INTEGER  shift 11
+	TOKEN_CHAR  shift 12
+	TOKEN_VOID  shift 13
+	TOKEN_BOOLEAN  shift 14
+	TOKEN_ARRAY  shift 15
+	TOKEN_RIGHT_PAREN  reduce 71
 
-    $default  reduce using rule 92 (lt)
+	type  goto 119
+	param_list  goto 120
+	not_empty_param_list  goto 121
+	param  goto 122
+	integer  goto 17
+	void  goto 18
+	string  goto 19
+	char  goto 20
+	boolean  goto 21
+	array  goto 22
+	function  goto 23
 
 
 state 62
+	and : TOKEN_AND .  (99)
 
-   93 gt: TOKEN_GT .
-
-    $default  reduce using rule 93 (gt)
+	.  reduce 99
 
 
 state 63
+	or : TOKEN_OR .  (100)
 
-   94 and: TOKEN_AND .
-
-    $default  reduce using rule 94 (and)
+	.  reduce 100
 
 
 state 64
+	decl : identifier colon type assign expr semicolon .  (4)
 
-   95 or: TOKEN_OR .
-
-    $default  reduce using rule 95 (or)
+	.  reduce 4
 
 
 state 65
+	expr : expr and . compare_expr  (23)
 
-   97 increment: TOKEN_INCREMENT .
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    $default  reduce using rule 97 (increment)
+	compare_expr  goto 123
+	add_expr  goto 42
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 66
+	expr : expr or . compare_expr  (24)
 
-   98 decrement: TOKEN_DECREMENT .
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    $default  reduce using rule 98 (decrement)
+	compare_expr  goto 124
+	add_expr  goto 42
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 67
+	ge : TOKEN_GE .  (93)
 
-   99 add: TOKEN_ADD .
-
-    $default  reduce using rule 99 (add)
+	.  reduce 93
 
 
 state 68
+	le : TOKEN_LE .  (94)
 
-  101 multiply: TOKEN_MULTIPLY .
-
-    $default  reduce using rule 101 (multiply)
+	.  reduce 94
 
 
 state 69
+	eq : TOKEN_EQ .  (95)
 
-  102 divide: TOKEN_DIVIDE .
-
-    $default  reduce using rule 102 (divide)
+	.  reduce 95
 
 
 state 70
+	ne : TOKEN_NE .  (96)
 
-  103 modulus: TOKEN_MODULUS .
-
-    $default  reduce using rule 103 (modulus)
+	.  reduce 96
 
 
 state 71
+	lt : TOKEN_LT .  (97)
 
-  104 exponentiate: TOKEN_EXPONENTIATE .
-
-    $default  reduce using rule 104 (exponentiate)
+	.  reduce 97
 
 
 state 72
+	gt : TOKEN_GT .  (98)
 
-   30 expr: expr ge . primary_expr
-
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    primary_expr     go to state 119
-    left_brace       go to state 56
-    left_paren       go to state 44
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	.  reduce 98
 
 
 state 73
+	add : TOKEN_ADD .  (104)
 
-   32 expr: expr le . primary_expr
-
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    primary_expr     go to state 120
-    left_brace       go to state 56
-    left_paren       go to state 44
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	.  reduce 104
 
 
 state 74
+	compare_expr : add_expr ne . add_expr  (26)
 
-   27 expr: expr eq . primary_expr
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    primary_expr     go to state 121
-    left_brace       go to state 56
-    left_paren       go to state 44
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	add_expr  goto 125
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 75
+	compare_expr : add_expr gt . add_expr  (27)
 
-   28 expr: expr ne . primary_expr
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    primary_expr     go to state 122
-    left_brace       go to state 56
-    left_paren       go to state 44
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	add_expr  goto 126
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 76
+	compare_expr : add_expr ge . add_expr  (28)
 
-   31 expr: expr lt . primary_expr
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    primary_expr     go to state 123
-    left_brace       go to state 56
-    left_paren       go to state 44
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	add_expr  goto 127
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 77
+	compare_expr : add_expr lt . add_expr  (29)
 
-   29 expr: expr gt . primary_expr
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    primary_expr     go to state 124
-    left_brace       go to state 56
-    left_paren       go to state 44
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	add_expr  goto 128
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 78
+	compare_expr : add_expr le . add_expr  (30)
 
-   33 expr: expr and . primary_expr
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    primary_expr     go to state 125
-    left_brace       go to state 56
-    left_paren       go to state 44
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	add_expr  goto 129
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 79
+	compare_expr : add_expr eq . add_expr  (31)
 
-   34 expr: expr or . primary_expr
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    primary_expr     go to state 126
-    left_brace       go to state 56
-    left_paren       go to state 44
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	add_expr  goto 130
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 80
+	add_expr : add_expr add . mul_expr  (33)
 
-   36 expr: expr increment .
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    $default  reduce using rule 36 (expr)
+	mul_expr  goto 131
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 81
+	add_expr : add_expr subtract . mul_expr  (34)
 
-   37 expr: expr decrement .
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    $default  reduce using rule 37 (expr)
+	mul_expr  goto 132
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 82
+	multiply : TOKEN_MULTIPLY .  (106)
 
-   23 expr: expr add . primary_expr
-
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    primary_expr     go to state 127
-    left_brace       go to state 56
-    left_paren       go to state 44
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	.  reduce 106
 
 
 state 83
+	divide : TOKEN_DIVIDE .  (107)
 
-   24 expr: expr subtract . primary_expr
-
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    primary_expr     go to state 128
-    left_brace       go to state 56
-    left_paren       go to state 44
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	.  reduce 107
 
 
 state 84
+	modulus : TOKEN_MODULUS .  (108)
 
-   25 expr: expr multiply . primary_expr
-
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    primary_expr     go to state 129
-    left_brace       go to state 56
-    left_paren       go to state 44
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	.  reduce 108
 
 
 state 85
+	mul_expr : mul_expr multiply . expon_expr  (36)
 
-   26 expr: expr divide . primary_expr
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    primary_expr     go to state 130
-    left_brace       go to state 56
-    left_paren       go to state 44
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	expon_expr  goto 133
+	neg_expr  goto 45
+	incr_expr  goto 46
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 86
+	mul_expr : mul_expr divide . expon_expr  (37)
 
-   38 expr: expr modulus . primary_expr
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    primary_expr     go to state 131
-    left_brace       go to state 56
-    left_paren       go to state 44
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	expon_expr  goto 134
+	neg_expr  goto 45
+	incr_expr  goto 46
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 87
+	mul_expr : mul_expr modulus . expon_expr  (38)
 
-   39 expr: expr exponentiate . primary_expr
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    primary_expr     go to state 132
-    left_brace       go to state 56
-    left_paren       go to state 44
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	expon_expr  goto 135
+	neg_expr  goto 45
+	incr_expr  goto 46
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 88
+	exponentiate : TOKEN_EXPONENTIATE .  (109)
 
-    4 decl: identifier colon type assign expr semicolon .
-
-    $default  reduce using rule 4 (decl)
+	.  reduce 109
 
 
 state 89
+	expon_expr : neg_expr exponentiate . expon_expr  (40)
 
-   70 print: TOKEN_PRINT .
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    $default  reduce using rule 70 (print)
+	expon_expr  goto 136
+	neg_expr  goto 45
+	incr_expr  goto 46
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 90
+	increment : TOKEN_INCREMENT .  (102)
 
-   72 for: TOKEN_FOR .
-
-    $default  reduce using rule 72 (for)
+	.  reduce 102
 
 
 state 91
+	decrement : TOKEN_DECREMENT .  (103)
 
-   73 if: TOKEN_IF .
-
-    $default  reduce using rule 73 (if)
+	.  reduce 103
 
 
 state 92
+	incr_expr : primary_expr increment .  (45)
 
-   75 return: TOKEN_RETURN .
-
-    $default  reduce using rule 75 (return)
+	.  reduce 45
 
 
 state 93
+	incr_expr : primary_expr decrement .  (46)
 
-    9 closed_stmt: decl .
-
-    $default  reduce using rule 9 (closed_stmt)
+	.  reduce 46
 
 
 state 94
+	primary_expr : identifier left_paren . expr_list right_paren  (55)
+	expr_list : .  (51)
 
-   21 not_empty_stmt_list: stmt . not_empty_stmt_list
-   22                    | stmt .
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	TOKEN_RIGHT_PAREN  reduce 51
 
-    TOKEN_PRINT            shift, and go to state 89
-    TOKEN_FOR              shift, and go to state 90
-    TOKEN_IF               shift, and go to state 91
-    TOKEN_RETURN           shift, and go to state 92
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_NOT              shift, and go to state 34
-    TOKEN_SUBTRACT         shift, and go to state 35
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    $default  reduce using rule 22 (not_empty_stmt_list)
-
-    decl                 go to state 93
-    stmt                 go to state 94
-    closed_stmt          go to state 95
-    open_stmt            go to state 96
-    not_empty_stmt_list  go to state 133
-    expr                 go to state 134
-    primary_expr         go to state 42
-    print                go to state 101
-    for                  go to state 102
-    if                   go to state 103
-    return               go to state 104
-    left_brace           go to state 105
-    left_paren           go to state 44
-    not                  go to state 45
-    subtract             go to state 46
-    true                 go to state 47
-    false                go to state 48
-    char_literal         go to state 49
-    integer_literal      go to state 50
-    string_literal       go to state 51
-    identifier           go to state 106
+	expr  goto 118
+	compare_expr  goto 41
+	add_expr  goto 42
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	expr_list  goto 137
+	not_empty_expr_list  goto 138
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 95
+	print : TOKEN_PRINT .  (75)
 
-    8 stmt: closed_stmt .
-
-    $default  reduce using rule 8 (stmt)
+	.  reduce 75
 
 
 state 96
+	for : TOKEN_FOR .  (77)
 
-    7 stmt: open_stmt .
-
-    $default  reduce using rule 7 (stmt)
+	.  reduce 77
 
 
 state 97
+	if : TOKEN_IF .  (78)
 
-    6 decl: identifier colon type assign left_brace stmt_list . right_brace
-
-    TOKEN_RIGHT_BRACE  shift, and go to state 135
-
-    right_brace  go to state 136
+	.  reduce 78
 
 
 state 98
+	return : TOKEN_RETURN .  (80)
 
-   19 stmt_list: not_empty_stmt_list .
-
-    $default  reduce using rule 19 (stmt_list)
+	.  reduce 80
 
 
 state 99
+	closed_stmt : decl .  (9)
 
-   10 closed_stmt: expr . semicolon
-   23 expr: expr . add primary_expr
-   24     | expr . subtract primary_expr
-   25     | expr . multiply primary_expr
-   26     | expr . divide primary_expr
-   27     | expr . eq primary_expr
-   28     | expr . ne primary_expr
-   29     | expr . gt primary_expr
-   30     | expr . ge primary_expr
-   31     | expr . lt primary_expr
-   32     | expr . le primary_expr
-   33     | expr . and primary_expr
-   34     | expr . or primary_expr
-   36     | expr . increment
-   37     | expr . decrement
-   38     | expr . modulus primary_expr
-   39     | expr . exponentiate primary_expr
-   46 not_empty_expr_list: expr . comma not_empty_expr_list
-   47                    | expr .
-
-    TOKEN_GE            shift, and go to state 57
-    TOKEN_LE            shift, and go to state 58
-    TOKEN_EQ            shift, and go to state 59
-    TOKEN_NE            shift, and go to state 60
-    TOKEN_LT            shift, and go to state 61
-    TOKEN_GT            shift, and go to state 62
-    TOKEN_AND           shift, and go to state 63
-    TOKEN_OR            shift, and go to state 64
-    TOKEN_INCREMENT     shift, and go to state 65
-    TOKEN_DECREMENT     shift, and go to state 66
-    TOKEN_ADD           shift, and go to state 67
-    TOKEN_SUBTRACT      shift, and go to state 35
-    TOKEN_MULTIPLY      shift, and go to state 68
-    TOKEN_DIVIDE        shift, and go to state 69
-    TOKEN_MODULUS       shift, and go to state 70
-    TOKEN_EXPONENTIATE  shift, and go to state 71
-    TOKEN_COMMA         shift, and go to state 137
-    TOKEN_SEMICOLON     shift, and go to state 26
-
-    $default  reduce using rule 47 (not_empty_expr_list)
-
-    ge            go to state 72
-    le            go to state 73
-    eq            go to state 74
-    ne            go to state 75
-    lt            go to state 76
-    gt            go to state 77
-    and           go to state 78
-    or            go to state 79
-    increment     go to state 80
-    decrement     go to state 81
-    add           go to state 82
-    subtract      go to state 83
-    multiply      go to state 84
-    divide        go to state 85
-    modulus       go to state 86
-    exponentiate  go to state 87
-    comma         go to state 138
-    semicolon     go to state 139
+	.  reduce 9
 
 
 state 100
+	closed_stmt : expr . semicolon  (10)
+	expr : expr . and compare_expr  (23)
+	expr : expr . or compare_expr  (24)
+	not_empty_expr_list : expr . comma not_empty_expr_list  (52)
+	not_empty_expr_list : expr .  (53)
 
-   55 primary_expr: left_brace not_empty_expr_list . right_brace
+	TOKEN_AND  shift 62
+	TOKEN_OR  shift 63
+	TOKEN_COMMA  shift 139
+	TOKEN_SEMICOLON  shift 25
+	TOKEN_RIGHT_BRACE  reduce 53
 
-    TOKEN_RIGHT_BRACE  shift, and go to state 135
-
-    right_brace  go to state 140
+	semicolon  goto 140
+	and  goto 65
+	or  goto 66
+	comma  goto 141
 
 
 state 101
+	primary_expr : left_brace not_empty_expr_list . right_brace  (62)
 
-   12 closed_stmt: print . expr_list semicolon
+	TOKEN_RIGHT_BRACE  shift 142
+	.  error
 
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_NOT              shift, and go to state 34
-    TOKEN_SUBTRACT         shift, and go to state 35
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    $default  reduce using rule 45 (expr_list)
-
-    expr                 go to state 118
-    expr_list            go to state 141
-    not_empty_expr_list  go to state 142
-    primary_expr         go to state 42
-    left_brace           go to state 56
-    left_paren           go to state 44
-    not                  go to state 45
-    subtract             go to state 46
-    true                 go to state 47
-    false                go to state 48
-    char_literal         go to state 49
-    integer_literal      go to state 50
-    string_literal       go to state 51
-    identifier           go to state 52
+	right_brace  goto 143
 
 
 state 102
+	not_empty_stmt_list : stmt . not_empty_stmt_list  (21)
+	not_empty_stmt_list : stmt .  (22)
 
-   13 closed_stmt: for . left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren closed_stmt
-   18 open_stmt: for . left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren open_stmt
+	TOKEN_PRINT  shift 95
+	TOKEN_FOR  shift 96
+	TOKEN_IF  shift 97
+	TOKEN_RETURN  shift 98
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	TOKEN_RIGHT_BRACE  reduce 22
 
-    TOKEN_LEFT_PAREN  shift, and go to state 33
-
-    left_paren  go to state 143
+	decl  goto 99
+	expr  goto 144
+	compare_expr  goto 41
+	add_expr  goto 42
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	primary_expr  goto 47
+	stmt  goto 102
+	open_stmt  goto 103
+	closed_stmt  goto 104
+	not_empty_stmt_list  goto 145
+	identifier  goto 107
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 108
+	return  goto 109
+	print  goto 110
+	for  goto 111
+	left_paren  goto 53
+	if  goto 112
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 103
+	stmt : open_stmt .  (7)
 
-   14 closed_stmt: if . left_paren expr right_paren closed_stmt else closed_stmt
-   16 open_stmt: if . left_paren expr right_paren stmt
-   17          | if . left_paren expr right_paren closed_stmt else open_stmt
-
-    TOKEN_LEFT_PAREN  shift, and go to state 33
-
-    left_paren  go to state 144
+	.  reduce 7
 
 
 state 104
+	stmt : closed_stmt .  (8)
 
-   11 closed_stmt: return . opt_expr semicolon
-
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_NOT              shift, and go to state 34
-    TOKEN_SUBTRACT         shift, and go to state 35
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    $default  reduce using rule 43 (opt_expr)
-
-    expr             go to state 54
-    opt_expr         go to state 145
-    primary_expr     go to state 42
-    left_brace       go to state 56
-    left_paren       go to state 44
-    not              go to state 45
-    subtract         go to state 46
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	.  reduce 8
 
 
 state 105
+	decl : identifier colon type assign left_brace stmt_list . right_brace  (6)
 
-   15 closed_stmt: left_brace . stmt_list right_brace
-   55 primary_expr: left_brace . not_empty_expr_list right_brace
+	TOKEN_RIGHT_BRACE  shift 142
+	.  error
 
-    TOKEN_PRINT            shift, and go to state 89
-    TOKEN_FOR              shift, and go to state 90
-    TOKEN_IF               shift, and go to state 91
-    TOKEN_RETURN           shift, and go to state 92
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_NOT              shift, and go to state 34
-    TOKEN_SUBTRACT         shift, and go to state 35
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    $default  reduce using rule 20 (stmt_list)
-
-    decl                 go to state 93
-    stmt                 go to state 94
-    closed_stmt          go to state 95
-    open_stmt            go to state 96
-    stmt_list            go to state 146
-    not_empty_stmt_list  go to state 98
-    expr                 go to state 99
-    not_empty_expr_list  go to state 100
-    primary_expr         go to state 42
-    print                go to state 101
-    for                  go to state 102
-    if                   go to state 103
-    return               go to state 104
-    left_brace           go to state 105
-    left_paren           go to state 44
-    not                  go to state 45
-    subtract             go to state 46
-    true                 go to state 47
-    false                go to state 48
-    char_literal         go to state 49
-    integer_literal      go to state 50
-    string_literal       go to state 51
-    identifier           go to state 106
+	right_brace  goto 146
 
 
 state 106
+	stmt_list : not_empty_stmt_list .  (19)
 
-    4 decl: identifier . colon type assign expr semicolon
-    5     | identifier . colon type semicolon
-    6     | identifier . colon type assign left_brace stmt_list right_brace
-   48 primary_expr: identifier . opt_parenthetical_expr_list
-
-    TOKEN_LEFT_PAREN  shift, and go to state 33
-    TOKEN_COLON       shift, and go to state 8
-
-    $default  reduce using rule 57 (opt_parenthetical_expr_list)
-
-    opt_parenthetical_expr_list  go to state 110
-    left_paren                   go to state 111
-    colon                        go to state 9
+	.  reduce 19
 
 
 state 107
+	decl : identifier . colon type assign expr semicolon  (4)
+	decl : identifier . colon type semicolon  (5)
+	decl : identifier . colon type assign left_brace stmt_list right_brace  (6)
+	primary_expr : identifier .  (54)
+	primary_expr : identifier . left_paren expr_list right_paren  (55)
 
-   23 expr: expr . add primary_expr
-   24     | expr . subtract primary_expr
-   25     | expr . multiply primary_expr
-   26     | expr . divide primary_expr
-   27     | expr . eq primary_expr
-   28     | expr . ne primary_expr
-   29     | expr . gt primary_expr
-   30     | expr . ge primary_expr
-   31     | expr . lt primary_expr
-   32     | expr . le primary_expr
-   33     | expr . and primary_expr
-   34     | expr . or primary_expr
-   36     | expr . increment
-   37     | expr . decrement
-   38     | expr . modulus primary_expr
-   39     | expr . exponentiate primary_expr
-   54 primary_expr: left_paren expr . right_paren
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_COLON  shift 7
+	TOKEN_RIGHT_BRACE  reduce 54
+	TOKEN_GE  reduce 54
+	TOKEN_LE  reduce 54
+	TOKEN_EQ  reduce 54
+	TOKEN_NE  reduce 54
+	TOKEN_LT  reduce 54
+	TOKEN_GT  reduce 54
+	TOKEN_AND  reduce 54
+	TOKEN_OR  reduce 54
+	TOKEN_INCREMENT  reduce 54
+	TOKEN_DECREMENT  reduce 54
+	TOKEN_ADD  reduce 54
+	TOKEN_SUBTRACT  reduce 54
+	TOKEN_MULTIPLY  reduce 54
+	TOKEN_DIVIDE  reduce 54
+	TOKEN_MODULUS  reduce 54
+	TOKEN_EXPONENTIATE  reduce 54
+	TOKEN_COMMA  reduce 54
+	TOKEN_SEMICOLON  reduce 54
 
-    TOKEN_RIGHT_PAREN   shift, and go to state 147
-    TOKEN_GE            shift, and go to state 57
-    TOKEN_LE            shift, and go to state 58
-    TOKEN_EQ            shift, and go to state 59
-    TOKEN_NE            shift, and go to state 60
-    TOKEN_LT            shift, and go to state 61
-    TOKEN_GT            shift, and go to state 62
-    TOKEN_AND           shift, and go to state 63
-    TOKEN_OR            shift, and go to state 64
-    TOKEN_INCREMENT     shift, and go to state 65
-    TOKEN_DECREMENT     shift, and go to state 66
-    TOKEN_ADD           shift, and go to state 67
-    TOKEN_SUBTRACT      shift, and go to state 35
-    TOKEN_MULTIPLY      shift, and go to state 68
-    TOKEN_DIVIDE        shift, and go to state 69
-    TOKEN_MODULUS       shift, and go to state 70
-    TOKEN_EXPONENTIATE  shift, and go to state 71
-
-    right_paren   go to state 148
-    ge            go to state 72
-    le            go to state 73
-    eq            go to state 74
-    ne            go to state 75
-    lt            go to state 76
-    gt            go to state 77
-    and           go to state 78
-    or            go to state 79
-    increment     go to state 80
-    decrement     go to state 81
-    add           go to state 82
-    subtract      go to state 83
-    multiply      go to state 84
-    divide        go to state 85
-    modulus       go to state 86
-    exponentiate  go to state 87
+	colon  goto 8
+	left_paren  goto 94
 
 
 state 108
+	closed_stmt : left_brace . stmt_list right_brace  (15)
+	primary_expr : left_brace . not_empty_expr_list right_brace  (62)
+	stmt_list : .  (20)
 
-   35 expr: not primary_expr .
+	TOKEN_PRINT  shift 95
+	TOKEN_FOR  shift 96
+	TOKEN_IF  shift 97
+	TOKEN_RETURN  shift 98
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	TOKEN_RIGHT_BRACE  reduce 20
 
-    $default  reduce using rule 35 (expr)
+	decl  goto 99
+	expr  goto 100
+	compare_expr  goto 41
+	add_expr  goto 42
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	not_empty_expr_list  goto 101
+	primary_expr  goto 47
+	stmt  goto 102
+	open_stmt  goto 103
+	closed_stmt  goto 104
+	stmt_list  goto 147
+	not_empty_stmt_list  goto 106
+	identifier  goto 107
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 108
+	return  goto 109
+	print  goto 110
+	for  goto 111
+	left_paren  goto 53
+	if  goto 112
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 109
+	closed_stmt : return . opt_expr semicolon  (11)
+	opt_expr : .  (49)
 
-   40 expr: subtract primary_expr .
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	TOKEN_SEMICOLON  reduce 49
 
-    $default  reduce using rule 40 (expr)
+	expr  goto 58
+	compare_expr  goto 41
+	add_expr  goto 42
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	opt_expr  goto 148
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 110
+	closed_stmt : print . expr_list semicolon  (12)
+	expr_list : .  (51)
 
-   48 primary_expr: identifier opt_parenthetical_expr_list .
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	TOKEN_SEMICOLON  reduce 51
 
-    $default  reduce using rule 48 (primary_expr)
+	expr  goto 118
+	compare_expr  goto 41
+	add_expr  goto 42
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	expr_list  goto 149
+	not_empty_expr_list  goto 138
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 111
+	closed_stmt : for . left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren closed_stmt  (13)
+	open_stmt : for . left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren open_stmt  (18)
 
-   56 opt_parenthetical_expr_list: left_paren . expr_list right_paren
+	TOKEN_LEFT_PAREN  shift 32
+	.  error
 
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_NOT              shift, and go to state 34
-    TOKEN_SUBTRACT         shift, and go to state 35
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    $default  reduce using rule 45 (expr_list)
-
-    expr                 go to state 118
-    expr_list            go to state 149
-    not_empty_expr_list  go to state 142
-    primary_expr         go to state 42
-    left_brace           go to state 56
-    left_paren           go to state 44
-    not                  go to state 45
-    subtract             go to state 46
-    true                 go to state 47
-    false                go to state 48
-    char_literal         go to state 49
-    integer_literal      go to state 50
-    string_literal       go to state 51
-    identifier           go to state 52
+	left_paren  goto 150
 
 
 state 112
+	closed_stmt : if . left_paren expr right_paren closed_stmt else closed_stmt  (14)
+	open_stmt : if . left_paren expr right_paren stmt  (16)
+	open_stmt : if . left_paren expr right_paren closed_stmt else open_stmt  (17)
 
-   64 type: function type left_paren param_list . right_paren
+	TOKEN_LEFT_PAREN  shift 32
+	.  error
 
-    TOKEN_RIGHT_PAREN  shift, and go to state 147
-
-    right_paren  go to state 150
+	left_paren  goto 151
 
 
 state 113
+	expr : expr . and compare_expr  (23)
+	expr : expr . or compare_expr  (24)
+	primary_expr : left_paren expr . right_paren  (61)
 
-   65 param_list: not_empty_param_list .
+	TOKEN_RIGHT_PAREN  shift 152
+	TOKEN_AND  shift 62
+	TOKEN_OR  shift 63
+	.  error
 
-    $default  reduce using rule 65 (param_list)
+	right_paren  goto 153
+	and  goto 65
+	or  goto 66
 
 
 state 114
+	neg_expr : subtract incr_expr .  (42)
 
-   67 not_empty_param_list: param .
-   68                     | param . comma not_empty_param_list
-
-    TOKEN_COMMA  shift, and go to state 137
-
-    $default  reduce using rule 67 (not_empty_param_list)
-
-    comma  go to state 151
+	.  reduce 42
 
 
 state 115
+	neg_expr : not incr_expr .  (43)
 
-   69 param: identifier .
-
-    $default  reduce using rule 69 (param)
+	.  reduce 43
 
 
 state 116
+	right_bracket : TOKEN_RIGHT_BRACKET .  (86)
 
-   81 right_bracket: TOKEN_RIGHT_BRACKET .
-
-    $default  reduce using rule 81 (right_bracket)
+	.  reduce 86
 
 
 state 117
+	type : array left_bracket opt_expr right_bracket . type  (68)
 
-   63 type: array left_bracket opt_expr right_bracket . type
+	TOKEN_FUNCTION  shift 9
+	TOKEN_STRING  shift 10
+	TOKEN_INTEGER  shift 11
+	TOKEN_CHAR  shift 12
+	TOKEN_VOID  shift 13
+	TOKEN_BOOLEAN  shift 14
+	TOKEN_ARRAY  shift 15
+	.  error
 
-    TOKEN_FUNCTION  shift, and go to state 10
-    TOKEN_STRING    shift, and go to state 11
-    TOKEN_INTEGER   shift, and go to state 12
-    TOKEN_CHAR      shift, and go to state 13
-    TOKEN_VOID      shift, and go to state 14
-    TOKEN_BOOLEAN   shift, and go to state 15
-    TOKEN_ARRAY     shift, and go to state 16
-
-    type      go to state 152
-    function  go to state 18
-    string    go to state 19
-    integer   go to state 20
-    char      go to state 21
-    void      go to state 22
-    boolean   go to state 23
-    array     go to state 24
+	type  goto 154
+	integer  goto 17
+	void  goto 18
+	string  goto 19
+	char  goto 20
+	boolean  goto 21
+	array  goto 22
+	function  goto 23
 
 
 state 118
+	expr : expr . and compare_expr  (23)
+	expr : expr . or compare_expr  (24)
+	not_empty_expr_list : expr . comma not_empty_expr_list  (52)
+	not_empty_expr_list : expr .  (53)
 
-   23 expr: expr . add primary_expr
-   24     | expr . subtract primary_expr
-   25     | expr . multiply primary_expr
-   26     | expr . divide primary_expr
-   27     | expr . eq primary_expr
-   28     | expr . ne primary_expr
-   29     | expr . gt primary_expr
-   30     | expr . ge primary_expr
-   31     | expr . lt primary_expr
-   32     | expr . le primary_expr
-   33     | expr . and primary_expr
-   34     | expr . or primary_expr
-   36     | expr . increment
-   37     | expr . decrement
-   38     | expr . modulus primary_expr
-   39     | expr . exponentiate primary_expr
-   46 not_empty_expr_list: expr . comma not_empty_expr_list
-   47                    | expr .
+	TOKEN_AND  shift 62
+	TOKEN_OR  shift 63
+	TOKEN_COMMA  shift 139
+	TOKEN_RIGHT_BRACE  reduce 53
+	TOKEN_RIGHT_PAREN  reduce 53
+	TOKEN_SEMICOLON  reduce 53
 
-    TOKEN_GE            shift, and go to state 57
-    TOKEN_LE            shift, and go to state 58
-    TOKEN_EQ            shift, and go to state 59
-    TOKEN_NE            shift, and go to state 60
-    TOKEN_LT            shift, and go to state 61
-    TOKEN_GT            shift, and go to state 62
-    TOKEN_AND           shift, and go to state 63
-    TOKEN_OR            shift, and go to state 64
-    TOKEN_INCREMENT     shift, and go to state 65
-    TOKEN_DECREMENT     shift, and go to state 66
-    TOKEN_ADD           shift, and go to state 67
-    TOKEN_SUBTRACT      shift, and go to state 35
-    TOKEN_MULTIPLY      shift, and go to state 68
-    TOKEN_DIVIDE        shift, and go to state 69
-    TOKEN_MODULUS       shift, and go to state 70
-    TOKEN_EXPONENTIATE  shift, and go to state 71
-    TOKEN_COMMA         shift, and go to state 137
-
-    $default  reduce using rule 47 (not_empty_expr_list)
-
-    ge            go to state 72
-    le            go to state 73
-    eq            go to state 74
-    ne            go to state 75
-    lt            go to state 76
-    gt            go to state 77
-    and           go to state 78
-    or            go to state 79
-    increment     go to state 80
-    decrement     go to state 81
-    add           go to state 82
-    subtract      go to state 83
-    multiply      go to state 84
-    divide        go to state 85
-    modulus       go to state 86
-    exponentiate  go to state 87
-    comma         go to state 138
+	and  goto 65
+	or  goto 66
+	comma  goto 141
 
 
 state 119
+	param : type . colon identifier  (74)
 
-   30 expr: expr ge primary_expr .
+	TOKEN_COLON  shift 7
+	.  error
 
-    $default  reduce using rule 30 (expr)
+	colon  goto 155
 
 
 state 120
+	type : function type left_paren param_list . right_paren  (69)
 
-   32 expr: expr le primary_expr .
+	TOKEN_RIGHT_PAREN  shift 152
+	.  error
 
-    $default  reduce using rule 32 (expr)
+	right_paren  goto 156
 
 
 state 121
+	param_list : not_empty_param_list .  (70)
 
-   27 expr: expr eq primary_expr .
-
-    $default  reduce using rule 27 (expr)
+	.  reduce 70
 
 
 state 122
+	not_empty_param_list : param .  (72)
+	not_empty_param_list : param . comma not_empty_param_list  (73)
 
-   28 expr: expr ne primary_expr .
+	TOKEN_COMMA  shift 139
+	TOKEN_RIGHT_PAREN  reduce 72
 
-    $default  reduce using rule 28 (expr)
+	comma  goto 157
 
 
 state 123
+	expr : expr and compare_expr .  (23)
 
-   31 expr: expr lt primary_expr .
-
-    $default  reduce using rule 31 (expr)
+	.  reduce 23
 
 
 state 124
+	expr : expr or compare_expr .  (24)
 
-   29 expr: expr gt primary_expr .
-
-    $default  reduce using rule 29 (expr)
+	.  reduce 24
 
 
 state 125
+	compare_expr : add_expr ne add_expr .  (26)
+	add_expr : add_expr . add mul_expr  (33)
+	add_expr : add_expr . subtract mul_expr  (34)
 
-   33 expr: expr and primary_expr .
+	TOKEN_ADD  shift 73
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_RIGHT_BRACE  reduce 26
+	TOKEN_RIGHT_PAREN  reduce 26
+	TOKEN_RIGHT_BRACKET  reduce 26
+	TOKEN_AND  reduce 26
+	TOKEN_OR  reduce 26
+	TOKEN_COMMA  reduce 26
+	TOKEN_SEMICOLON  reduce 26
 
-    $default  reduce using rule 33 (expr)
+	add  goto 80
+	subtract  goto 81
 
 
 state 126
+	compare_expr : add_expr gt add_expr .  (27)
+	add_expr : add_expr . add mul_expr  (33)
+	add_expr : add_expr . subtract mul_expr  (34)
 
-   34 expr: expr or primary_expr .
+	TOKEN_ADD  shift 73
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_RIGHT_BRACE  reduce 27
+	TOKEN_RIGHT_PAREN  reduce 27
+	TOKEN_RIGHT_BRACKET  reduce 27
+	TOKEN_AND  reduce 27
+	TOKEN_OR  reduce 27
+	TOKEN_COMMA  reduce 27
+	TOKEN_SEMICOLON  reduce 27
 
-    $default  reduce using rule 34 (expr)
+	add  goto 80
+	subtract  goto 81
 
 
 state 127
+	compare_expr : add_expr ge add_expr .  (28)
+	add_expr : add_expr . add mul_expr  (33)
+	add_expr : add_expr . subtract mul_expr  (34)
 
-   23 expr: expr add primary_expr .
+	TOKEN_ADD  shift 73
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_RIGHT_BRACE  reduce 28
+	TOKEN_RIGHT_PAREN  reduce 28
+	TOKEN_RIGHT_BRACKET  reduce 28
+	TOKEN_AND  reduce 28
+	TOKEN_OR  reduce 28
+	TOKEN_COMMA  reduce 28
+	TOKEN_SEMICOLON  reduce 28
 
-    $default  reduce using rule 23 (expr)
+	add  goto 80
+	subtract  goto 81
 
 
 state 128
+	compare_expr : add_expr lt add_expr .  (29)
+	add_expr : add_expr . add mul_expr  (33)
+	add_expr : add_expr . subtract mul_expr  (34)
 
-   24 expr: expr subtract primary_expr .
+	TOKEN_ADD  shift 73
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_RIGHT_BRACE  reduce 29
+	TOKEN_RIGHT_PAREN  reduce 29
+	TOKEN_RIGHT_BRACKET  reduce 29
+	TOKEN_AND  reduce 29
+	TOKEN_OR  reduce 29
+	TOKEN_COMMA  reduce 29
+	TOKEN_SEMICOLON  reduce 29
 
-    $default  reduce using rule 24 (expr)
+	add  goto 80
+	subtract  goto 81
 
 
 state 129
+	compare_expr : add_expr le add_expr .  (30)
+	add_expr : add_expr . add mul_expr  (33)
+	add_expr : add_expr . subtract mul_expr  (34)
 
-   25 expr: expr multiply primary_expr .
+	TOKEN_ADD  shift 73
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_RIGHT_BRACE  reduce 30
+	TOKEN_RIGHT_PAREN  reduce 30
+	TOKEN_RIGHT_BRACKET  reduce 30
+	TOKEN_AND  reduce 30
+	TOKEN_OR  reduce 30
+	TOKEN_COMMA  reduce 30
+	TOKEN_SEMICOLON  reduce 30
 
-    $default  reduce using rule 25 (expr)
+	add  goto 80
+	subtract  goto 81
 
 
 state 130
+	compare_expr : add_expr eq add_expr .  (31)
+	add_expr : add_expr . add mul_expr  (33)
+	add_expr : add_expr . subtract mul_expr  (34)
 
-   26 expr: expr divide primary_expr .
+	TOKEN_ADD  shift 73
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_RIGHT_BRACE  reduce 31
+	TOKEN_RIGHT_PAREN  reduce 31
+	TOKEN_RIGHT_BRACKET  reduce 31
+	TOKEN_AND  reduce 31
+	TOKEN_OR  reduce 31
+	TOKEN_COMMA  reduce 31
+	TOKEN_SEMICOLON  reduce 31
 
-    $default  reduce using rule 26 (expr)
+	add  goto 80
+	subtract  goto 81
 
 
 state 131
+	add_expr : add_expr add mul_expr .  (33)
+	mul_expr : mul_expr . multiply expon_expr  (36)
+	mul_expr : mul_expr . divide expon_expr  (37)
+	mul_expr : mul_expr . modulus expon_expr  (38)
 
-   38 expr: expr modulus primary_expr .
+	TOKEN_MULTIPLY  shift 82
+	TOKEN_DIVIDE  shift 83
+	TOKEN_MODULUS  shift 84
+	TOKEN_RIGHT_BRACE  reduce 33
+	TOKEN_RIGHT_PAREN  reduce 33
+	TOKEN_RIGHT_BRACKET  reduce 33
+	TOKEN_GE  reduce 33
+	TOKEN_LE  reduce 33
+	TOKEN_EQ  reduce 33
+	TOKEN_NE  reduce 33
+	TOKEN_LT  reduce 33
+	TOKEN_GT  reduce 33
+	TOKEN_AND  reduce 33
+	TOKEN_OR  reduce 33
+	TOKEN_ADD  reduce 33
+	TOKEN_SUBTRACT  reduce 33
+	TOKEN_COMMA  reduce 33
+	TOKEN_SEMICOLON  reduce 33
 
-    $default  reduce using rule 38 (expr)
+	multiply  goto 85
+	divide  goto 86
+	modulus  goto 87
 
 
 state 132
+	add_expr : add_expr subtract mul_expr .  (34)
+	mul_expr : mul_expr . multiply expon_expr  (36)
+	mul_expr : mul_expr . divide expon_expr  (37)
+	mul_expr : mul_expr . modulus expon_expr  (38)
 
-   39 expr: expr exponentiate primary_expr .
+	TOKEN_MULTIPLY  shift 82
+	TOKEN_DIVIDE  shift 83
+	TOKEN_MODULUS  shift 84
+	TOKEN_RIGHT_BRACE  reduce 34
+	TOKEN_RIGHT_PAREN  reduce 34
+	TOKEN_RIGHT_BRACKET  reduce 34
+	TOKEN_GE  reduce 34
+	TOKEN_LE  reduce 34
+	TOKEN_EQ  reduce 34
+	TOKEN_NE  reduce 34
+	TOKEN_LT  reduce 34
+	TOKEN_GT  reduce 34
+	TOKEN_AND  reduce 34
+	TOKEN_OR  reduce 34
+	TOKEN_ADD  reduce 34
+	TOKEN_SUBTRACT  reduce 34
+	TOKEN_COMMA  reduce 34
+	TOKEN_SEMICOLON  reduce 34
 
-    $default  reduce using rule 39 (expr)
+	multiply  goto 85
+	divide  goto 86
+	modulus  goto 87
 
 
 state 133
+	mul_expr : mul_expr multiply expon_expr .  (36)
 
-   21 not_empty_stmt_list: stmt not_empty_stmt_list .
-
-    $default  reduce using rule 21 (not_empty_stmt_list)
+	.  reduce 36
 
 
 state 134
+	mul_expr : mul_expr divide expon_expr .  (37)
 
-   10 closed_stmt: expr . semicolon
-   23 expr: expr . add primary_expr
-   24     | expr . subtract primary_expr
-   25     | expr . multiply primary_expr
-   26     | expr . divide primary_expr
-   27     | expr . eq primary_expr
-   28     | expr . ne primary_expr
-   29     | expr . gt primary_expr
-   30     | expr . ge primary_expr
-   31     | expr . lt primary_expr
-   32     | expr . le primary_expr
-   33     | expr . and primary_expr
-   34     | expr . or primary_expr
-   36     | expr . increment
-   37     | expr . decrement
-   38     | expr . modulus primary_expr
-   39     | expr . exponentiate primary_expr
-
-    TOKEN_GE            shift, and go to state 57
-    TOKEN_LE            shift, and go to state 58
-    TOKEN_EQ            shift, and go to state 59
-    TOKEN_NE            shift, and go to state 60
-    TOKEN_LT            shift, and go to state 61
-    TOKEN_GT            shift, and go to state 62
-    TOKEN_AND           shift, and go to state 63
-    TOKEN_OR            shift, and go to state 64
-    TOKEN_INCREMENT     shift, and go to state 65
-    TOKEN_DECREMENT     shift, and go to state 66
-    TOKEN_ADD           shift, and go to state 67
-    TOKEN_SUBTRACT      shift, and go to state 35
-    TOKEN_MULTIPLY      shift, and go to state 68
-    TOKEN_DIVIDE        shift, and go to state 69
-    TOKEN_MODULUS       shift, and go to state 70
-    TOKEN_EXPONENTIATE  shift, and go to state 71
-    TOKEN_SEMICOLON     shift, and go to state 26
-
-    ge            go to state 72
-    le            go to state 73
-    eq            go to state 74
-    ne            go to state 75
-    lt            go to state 76
-    gt            go to state 77
-    and           go to state 78
-    or            go to state 79
-    increment     go to state 80
-    decrement     go to state 81
-    add           go to state 82
-    subtract      go to state 83
-    multiply      go to state 84
-    divide        go to state 85
-    modulus       go to state 86
-    exponentiate  go to state 87
-    semicolon     go to state 139
+	.  reduce 37
 
 
 state 135
+	mul_expr : mul_expr modulus expon_expr .  (38)
 
-   77 right_brace: TOKEN_RIGHT_BRACE .
-
-    $default  reduce using rule 77 (right_brace)
+	.  reduce 38
 
 
 state 136
+	expon_expr : neg_expr exponentiate expon_expr .  (40)
 
-    6 decl: identifier colon type assign left_brace stmt_list right_brace .
-
-    $default  reduce using rule 6 (decl)
+	.  reduce 40
 
 
 state 137
+	primary_expr : identifier left_paren expr_list . right_paren  (55)
 
-  106 comma: TOKEN_COMMA .
+	TOKEN_RIGHT_PAREN  shift 152
+	.  error
 
-    $default  reduce using rule 106 (comma)
+	right_paren  goto 158
 
 
 state 138
+	expr_list : not_empty_expr_list .  (50)
 
-   46 not_empty_expr_list: expr comma . not_empty_expr_list
-
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_NOT              shift, and go to state 34
-    TOKEN_SUBTRACT         shift, and go to state 35
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    expr                 go to state 118
-    not_empty_expr_list  go to state 153
-    primary_expr         go to state 42
-    left_brace           go to state 56
-    left_paren           go to state 44
-    not                  go to state 45
-    subtract             go to state 46
-    true                 go to state 47
-    false                go to state 48
-    char_literal         go to state 49
-    integer_literal      go to state 50
-    string_literal       go to state 51
-    identifier           go to state 52
+	.  reduce 50
 
 
 state 139
+	comma : TOKEN_COMMA .  (111)
 
-   10 closed_stmt: expr semicolon .
-
-    $default  reduce using rule 10 (closed_stmt)
+	.  reduce 111
 
 
 state 140
+	closed_stmt : expr semicolon .  (10)
 
-   55 primary_expr: left_brace not_empty_expr_list right_brace .
-
-    $default  reduce using rule 55 (primary_expr)
+	.  reduce 10
 
 
 state 141
+	not_empty_expr_list : expr comma . not_empty_expr_list  (52)
 
-   12 closed_stmt: print expr_list . semicolon
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    TOKEN_SEMICOLON  shift, and go to state 26
-
-    semicolon  go to state 154
+	expr  goto 118
+	compare_expr  goto 41
+	add_expr  goto 42
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	not_empty_expr_list  goto 159
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 142
+	right_brace : TOKEN_RIGHT_BRACE .  (82)
 
-   44 expr_list: not_empty_expr_list .
-
-    $default  reduce using rule 44 (expr_list)
+	.  reduce 82
 
 
 state 143
+	primary_expr : left_brace not_empty_expr_list right_brace .  (62)
 
-   13 closed_stmt: for left_paren . opt_expr semicolon opt_expr semicolon opt_expr right_paren closed_stmt
-   18 open_stmt: for left_paren . opt_expr semicolon opt_expr semicolon opt_expr right_paren open_stmt
-
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_NOT              shift, and go to state 34
-    TOKEN_SUBTRACT         shift, and go to state 35
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    $default  reduce using rule 43 (opt_expr)
-
-    expr             go to state 54
-    opt_expr         go to state 155
-    primary_expr     go to state 42
-    left_brace       go to state 56
-    left_paren       go to state 44
-    not              go to state 45
-    subtract         go to state 46
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	.  reduce 62
 
 
 state 144
+	closed_stmt : expr . semicolon  (10)
+	expr : expr . and compare_expr  (23)
+	expr : expr . or compare_expr  (24)
 
-   14 closed_stmt: if left_paren . expr right_paren closed_stmt else closed_stmt
-   16 open_stmt: if left_paren . expr right_paren stmt
-   17          | if left_paren . expr right_paren closed_stmt else open_stmt
+	TOKEN_AND  shift 62
+	TOKEN_OR  shift 63
+	TOKEN_SEMICOLON  shift 25
+	.  error
 
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_NOT              shift, and go to state 34
-    TOKEN_SUBTRACT         shift, and go to state 35
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    expr             go to state 156
-    primary_expr     go to state 42
-    left_brace       go to state 56
-    left_paren       go to state 44
-    not              go to state 45
-    subtract         go to state 46
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	semicolon  goto 140
+	and  goto 65
+	or  goto 66
 
 
 state 145
+	not_empty_stmt_list : stmt not_empty_stmt_list .  (21)
 
-   11 closed_stmt: return opt_expr . semicolon
-
-    TOKEN_SEMICOLON  shift, and go to state 26
-
-    semicolon  go to state 157
+	.  reduce 21
 
 
 state 146
+	decl : identifier colon type assign left_brace stmt_list right_brace .  (6)
 
-   15 closed_stmt: left_brace stmt_list . right_brace
-
-    TOKEN_RIGHT_BRACE  shift, and go to state 135
-
-    right_brace  go to state 158
+	.  reduce 6
 
 
 state 147
+	closed_stmt : left_brace stmt_list . right_brace  (15)
 
-   79 right_paren: TOKEN_RIGHT_PAREN .
+	TOKEN_RIGHT_BRACE  shift 142
+	.  error
 
-    $default  reduce using rule 79 (right_paren)
+	right_brace  goto 160
 
 
 state 148
+	closed_stmt : return opt_expr . semicolon  (11)
 
-   54 primary_expr: left_paren expr right_paren .
+	TOKEN_SEMICOLON  shift 25
+	.  error
 
-    $default  reduce using rule 54 (primary_expr)
+	semicolon  goto 161
 
 
 state 149
+	closed_stmt : print expr_list . semicolon  (12)
 
-   56 opt_parenthetical_expr_list: left_paren expr_list . right_paren
+	TOKEN_SEMICOLON  shift 25
+	.  error
 
-    TOKEN_RIGHT_PAREN  shift, and go to state 147
-
-    right_paren  go to state 159
+	semicolon  goto 162
 
 
 state 150
+	closed_stmt : for left_paren . opt_expr semicolon opt_expr semicolon opt_expr right_paren closed_stmt  (13)
+	open_stmt : for left_paren . opt_expr semicolon opt_expr semicolon opt_expr right_paren open_stmt  (18)
+	opt_expr : .  (49)
 
-   64 type: function type left_paren param_list right_paren .
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	TOKEN_SEMICOLON  reduce 49
 
-    $default  reduce using rule 64 (type)
+	expr  goto 58
+	compare_expr  goto 41
+	add_expr  goto 42
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	opt_expr  goto 163
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 151
+	closed_stmt : if left_paren . expr right_paren closed_stmt else closed_stmt  (14)
+	open_stmt : if left_paren . expr right_paren stmt  (16)
+	open_stmt : if left_paren . expr right_paren closed_stmt else open_stmt  (17)
 
-   68 not_empty_param_list: param comma . not_empty_param_list
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    TOKEN_IDENTIFIER  shift, and go to state 1
-
-    not_empty_param_list  go to state 160
-    param                 go to state 114
-    identifier            go to state 115
+	expr  goto 164
+	compare_expr  goto 41
+	add_expr  goto 42
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 152
+	right_paren : TOKEN_RIGHT_PAREN .  (84)
 
-   63 type: array left_bracket opt_expr right_bracket type .
-
-    $default  reduce using rule 63 (type)
+	.  reduce 84
 
 
 state 153
+	primary_expr : left_paren expr right_paren .  (61)
 
-   46 not_empty_expr_list: expr comma not_empty_expr_list .
-
-    $default  reduce using rule 46 (not_empty_expr_list)
+	.  reduce 61
 
 
 state 154
+	type : array left_bracket opt_expr right_bracket type .  (68)
 
-   12 closed_stmt: print expr_list semicolon .
-
-    $default  reduce using rule 12 (closed_stmt)
+	.  reduce 68
 
 
 state 155
+	param : type colon . identifier  (74)
 
-   13 closed_stmt: for left_paren opt_expr . semicolon opt_expr semicolon opt_expr right_paren closed_stmt
-   18 open_stmt: for left_paren opt_expr . semicolon opt_expr semicolon opt_expr right_paren open_stmt
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    TOKEN_SEMICOLON  shift, and go to state 26
-
-    semicolon  go to state 161
+	identifier  goto 165
 
 
 state 156
+	type : function type left_paren param_list right_paren .  (69)
 
-   14 closed_stmt: if left_paren expr . right_paren closed_stmt else closed_stmt
-   16 open_stmt: if left_paren expr . right_paren stmt
-   17          | if left_paren expr . right_paren closed_stmt else open_stmt
-   23 expr: expr . add primary_expr
-   24     | expr . subtract primary_expr
-   25     | expr . multiply primary_expr
-   26     | expr . divide primary_expr
-   27     | expr . eq primary_expr
-   28     | expr . ne primary_expr
-   29     | expr . gt primary_expr
-   30     | expr . ge primary_expr
-   31     | expr . lt primary_expr
-   32     | expr . le primary_expr
-   33     | expr . and primary_expr
-   34     | expr . or primary_expr
-   36     | expr . increment
-   37     | expr . decrement
-   38     | expr . modulus primary_expr
-   39     | expr . exponentiate primary_expr
-
-    TOKEN_RIGHT_PAREN   shift, and go to state 147
-    TOKEN_GE            shift, and go to state 57
-    TOKEN_LE            shift, and go to state 58
-    TOKEN_EQ            shift, and go to state 59
-    TOKEN_NE            shift, and go to state 60
-    TOKEN_LT            shift, and go to state 61
-    TOKEN_GT            shift, and go to state 62
-    TOKEN_AND           shift, and go to state 63
-    TOKEN_OR            shift, and go to state 64
-    TOKEN_INCREMENT     shift, and go to state 65
-    TOKEN_DECREMENT     shift, and go to state 66
-    TOKEN_ADD           shift, and go to state 67
-    TOKEN_SUBTRACT      shift, and go to state 35
-    TOKEN_MULTIPLY      shift, and go to state 68
-    TOKEN_DIVIDE        shift, and go to state 69
-    TOKEN_MODULUS       shift, and go to state 70
-    TOKEN_EXPONENTIATE  shift, and go to state 71
-
-    right_paren   go to state 162
-    ge            go to state 72
-    le            go to state 73
-    eq            go to state 74
-    ne            go to state 75
-    lt            go to state 76
-    gt            go to state 77
-    and           go to state 78
-    or            go to state 79
-    increment     go to state 80
-    decrement     go to state 81
-    add           go to state 82
-    subtract      go to state 83
-    multiply      go to state 84
-    divide        go to state 85
-    modulus       go to state 86
-    exponentiate  go to state 87
+	.  reduce 69
 
 
 state 157
+	not_empty_param_list : param comma . not_empty_param_list  (73)
 
-   11 closed_stmt: return opt_expr semicolon .
+	TOKEN_FUNCTION  shift 9
+	TOKEN_STRING  shift 10
+	TOKEN_INTEGER  shift 11
+	TOKEN_CHAR  shift 12
+	TOKEN_VOID  shift 13
+	TOKEN_BOOLEAN  shift 14
+	TOKEN_ARRAY  shift 15
+	.  error
 
-    $default  reduce using rule 11 (closed_stmt)
+	type  goto 119
+	not_empty_param_list  goto 166
+	param  goto 122
+	integer  goto 17
+	void  goto 18
+	string  goto 19
+	char  goto 20
+	boolean  goto 21
+	array  goto 22
+	function  goto 23
 
 
 state 158
+	primary_expr : identifier left_paren expr_list right_paren .  (55)
 
-   15 closed_stmt: left_brace stmt_list right_brace .
-
-    $default  reduce using rule 15 (closed_stmt)
+	.  reduce 55
 
 
 state 159
+	not_empty_expr_list : expr comma not_empty_expr_list .  (52)
 
-   56 opt_parenthetical_expr_list: left_paren expr_list right_paren .
-
-    $default  reduce using rule 56 (opt_parenthetical_expr_list)
+	.  reduce 52
 
 
 state 160
+	closed_stmt : left_brace stmt_list right_brace .  (15)
 
-   68 not_empty_param_list: param comma not_empty_param_list .
-
-    $default  reduce using rule 68 (not_empty_param_list)
+	.  reduce 15
 
 
 state 161
+	closed_stmt : return opt_expr semicolon .  (11)
 
-   13 closed_stmt: for left_paren opt_expr semicolon . opt_expr semicolon opt_expr right_paren closed_stmt
-   18 open_stmt: for left_paren opt_expr semicolon . opt_expr semicolon opt_expr right_paren open_stmt
-
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_NOT              shift, and go to state 34
-    TOKEN_SUBTRACT         shift, and go to state 35
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    $default  reduce using rule 43 (opt_expr)
-
-    expr             go to state 54
-    opt_expr         go to state 163
-    primary_expr     go to state 42
-    left_brace       go to state 56
-    left_paren       go to state 44
-    not              go to state 45
-    subtract         go to state 46
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	.  reduce 11
 
 
 state 162
+	closed_stmt : print expr_list semicolon .  (12)
 
-   14 closed_stmt: if left_paren expr right_paren . closed_stmt else closed_stmt
-   16 open_stmt: if left_paren expr right_paren . stmt
-   17          | if left_paren expr right_paren . closed_stmt else open_stmt
-
-    TOKEN_PRINT            shift, and go to state 89
-    TOKEN_FOR              shift, and go to state 90
-    TOKEN_IF               shift, and go to state 91
-    TOKEN_RETURN           shift, and go to state 92
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_NOT              shift, and go to state 34
-    TOKEN_SUBTRACT         shift, and go to state 35
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    decl             go to state 93
-    stmt             go to state 164
-    closed_stmt      go to state 165
-    open_stmt        go to state 96
-    expr             go to state 134
-    primary_expr     go to state 42
-    print            go to state 101
-    for              go to state 102
-    if               go to state 103
-    return           go to state 104
-    left_brace       go to state 105
-    left_paren       go to state 44
-    not              go to state 45
-    subtract         go to state 46
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 106
+	.  reduce 12
 
 
 state 163
+	closed_stmt : for left_paren opt_expr . semicolon opt_expr semicolon opt_expr right_paren closed_stmt  (13)
+	open_stmt : for left_paren opt_expr . semicolon opt_expr semicolon opt_expr right_paren open_stmt  (18)
 
-   13 closed_stmt: for left_paren opt_expr semicolon opt_expr . semicolon opt_expr right_paren closed_stmt
-   18 open_stmt: for left_paren opt_expr semicolon opt_expr . semicolon opt_expr right_paren open_stmt
+	TOKEN_SEMICOLON  shift 25
+	.  error
 
-    TOKEN_SEMICOLON  shift, and go to state 26
-
-    semicolon  go to state 166
+	semicolon  goto 167
 
 
 state 164
+	closed_stmt : if left_paren expr . right_paren closed_stmt else closed_stmt  (14)
+	open_stmt : if left_paren expr . right_paren stmt  (16)
+	open_stmt : if left_paren expr . right_paren closed_stmt else open_stmt  (17)
+	expr : expr . and compare_expr  (23)
+	expr : expr . or compare_expr  (24)
 
-   16 open_stmt: if left_paren expr right_paren stmt .
+	TOKEN_RIGHT_PAREN  shift 152
+	TOKEN_AND  shift 62
+	TOKEN_OR  shift 63
+	.  error
 
-    $default  reduce using rule 16 (open_stmt)
+	right_paren  goto 168
+	and  goto 65
+	or  goto 66
 
 
 state 165
+	param : type colon identifier .  (74)
 
-    8 stmt: closed_stmt .
-   14 closed_stmt: if left_paren expr right_paren closed_stmt . else closed_stmt
-   17 open_stmt: if left_paren expr right_paren closed_stmt . else open_stmt
-
-    TOKEN_ELSE  shift, and go to state 167
-
-    $default  reduce using rule 8 (stmt)
-
-    else  go to state 168
+	.  reduce 74
 
 
 state 166
+	not_empty_param_list : param comma not_empty_param_list .  (73)
 
-   13 closed_stmt: for left_paren opt_expr semicolon opt_expr semicolon . opt_expr right_paren closed_stmt
-   18 open_stmt: for left_paren opt_expr semicolon opt_expr semicolon . opt_expr right_paren open_stmt
-
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_NOT              shift, and go to state 34
-    TOKEN_SUBTRACT         shift, and go to state 35
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    $default  reduce using rule 43 (opt_expr)
-
-    expr             go to state 54
-    opt_expr         go to state 169
-    primary_expr     go to state 42
-    left_brace       go to state 56
-    left_paren       go to state 44
-    not              go to state 45
-    subtract         go to state 46
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 52
+	.  reduce 73
 
 
 state 167
+	closed_stmt : for left_paren opt_expr semicolon . opt_expr semicolon opt_expr right_paren closed_stmt  (13)
+	open_stmt : for left_paren opt_expr semicolon . opt_expr semicolon opt_expr right_paren open_stmt  (18)
+	opt_expr : .  (49)
 
-   74 else: TOKEN_ELSE .
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	TOKEN_SEMICOLON  reduce 49
 
-    $default  reduce using rule 74 (else)
+	expr  goto 58
+	compare_expr  goto 41
+	add_expr  goto 42
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	opt_expr  goto 169
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 168
+	closed_stmt : if left_paren expr right_paren . closed_stmt else closed_stmt  (14)
+	open_stmt : if left_paren expr right_paren . stmt  (16)
+	open_stmt : if left_paren expr right_paren . closed_stmt else open_stmt  (17)
 
-   14 closed_stmt: if left_paren expr right_paren closed_stmt else . closed_stmt
-   17 open_stmt: if left_paren expr right_paren closed_stmt else . open_stmt
+	TOKEN_PRINT  shift 95
+	TOKEN_FOR  shift 96
+	TOKEN_IF  shift 97
+	TOKEN_RETURN  shift 98
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    TOKEN_PRINT            shift, and go to state 89
-    TOKEN_FOR              shift, and go to state 90
-    TOKEN_IF               shift, and go to state 91
-    TOKEN_RETURN           shift, and go to state 92
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_NOT              shift, and go to state 34
-    TOKEN_SUBTRACT         shift, and go to state 35
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    decl             go to state 93
-    closed_stmt      go to state 170
-    open_stmt        go to state 171
-    expr             go to state 134
-    primary_expr     go to state 42
-    print            go to state 101
-    for              go to state 102
-    if               go to state 103
-    return           go to state 104
-    left_brace       go to state 105
-    left_paren       go to state 44
-    not              go to state 45
-    subtract         go to state 46
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 106
+	decl  goto 99
+	expr  goto 144
+	compare_expr  goto 41
+	add_expr  goto 42
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	primary_expr  goto 47
+	stmt  goto 170
+	open_stmt  goto 103
+	closed_stmt  goto 171
+	identifier  goto 107
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 108
+	return  goto 109
+	print  goto 110
+	for  goto 111
+	left_paren  goto 53
+	if  goto 112
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 169
+	closed_stmt : for left_paren opt_expr semicolon opt_expr . semicolon opt_expr right_paren closed_stmt  (13)
+	open_stmt : for left_paren opt_expr semicolon opt_expr . semicolon opt_expr right_paren open_stmt  (18)
 
-   13 closed_stmt: for left_paren opt_expr semicolon opt_expr semicolon opt_expr . right_paren closed_stmt
-   18 open_stmt: for left_paren opt_expr semicolon opt_expr semicolon opt_expr . right_paren open_stmt
+	TOKEN_SEMICOLON  shift 25
+	.  error
 
-    TOKEN_RIGHT_PAREN  shift, and go to state 147
-
-    right_paren  go to state 172
+	semicolon  goto 172
 
 
 state 170
+	open_stmt : if left_paren expr right_paren stmt .  (16)
 
-   14 closed_stmt: if left_paren expr right_paren closed_stmt else closed_stmt .
-
-    $default  reduce using rule 14 (closed_stmt)
+	.  reduce 16
 
 
 state 171
+	stmt : closed_stmt .  (8)
+	closed_stmt : if left_paren expr right_paren closed_stmt . else closed_stmt  (14)
+	open_stmt : if left_paren expr right_paren closed_stmt . else open_stmt  (17)
 
-   17 open_stmt: if left_paren expr right_paren closed_stmt else open_stmt .
+	TOKEN_ELSE  shift 173
+	TOKEN_PRINT  reduce 8
+	TOKEN_FOR  reduce 8
+	TOKEN_IF  reduce 8
+	TOKEN_RETURN  reduce 8
+	TOKEN_LEFT_BRACE  reduce 8
+	TOKEN_RIGHT_BRACE  reduce 8
+	TOKEN_LEFT_PAREN  reduce 8
+	TOKEN_NOT  reduce 8
+	TOKEN_SUBTRACT  reduce 8
+	TOKEN_TRUE  reduce 8
+	TOKEN_FALSE  reduce 8
+	TOKEN_CHAR_LITERAL  reduce 8
+	TOKEN_INTEGER_LITERAL  reduce 8
+	TOKEN_STRING_LITERAL  reduce 8
+	TOKEN_IDENTIFIER  reduce 8
 
-    $default  reduce using rule 17 (open_stmt)
+	else  goto 174
 
 
 state 172
+	closed_stmt : for left_paren opt_expr semicolon opt_expr semicolon . opt_expr right_paren closed_stmt  (13)
+	open_stmt : for left_paren opt_expr semicolon opt_expr semicolon . opt_expr right_paren open_stmt  (18)
+	opt_expr : .  (49)
 
-   13 closed_stmt: for left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren . closed_stmt
-   18 open_stmt: for left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren . open_stmt
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	TOKEN_RIGHT_PAREN  reduce 49
 
-    TOKEN_PRINT            shift, and go to state 89
-    TOKEN_FOR              shift, and go to state 90
-    TOKEN_IF               shift, and go to state 91
-    TOKEN_RETURN           shift, and go to state 92
-    TOKEN_LEFT_BRACE       shift, and go to state 32
-    TOKEN_LEFT_PAREN       shift, and go to state 33
-    TOKEN_NOT              shift, and go to state 34
-    TOKEN_SUBTRACT         shift, and go to state 35
-    TOKEN_TRUE             shift, and go to state 36
-    TOKEN_FALSE            shift, and go to state 37
-    TOKEN_CHAR_LITERAL     shift, and go to state 38
-    TOKEN_INTEGER_LITERAL  shift, and go to state 39
-    TOKEN_STRING_LITERAL   shift, and go to state 40
-    TOKEN_IDENTIFIER       shift, and go to state 1
-
-    decl             go to state 93
-    closed_stmt      go to state 173
-    open_stmt        go to state 174
-    expr             go to state 134
-    primary_expr     go to state 42
-    print            go to state 101
-    for              go to state 102
-    if               go to state 103
-    return           go to state 104
-    left_brace       go to state 105
-    left_paren       go to state 44
-    not              go to state 45
-    subtract         go to state 46
-    true             go to state 47
-    false            go to state 48
-    char_literal     go to state 49
-    integer_literal  go to state 50
-    string_literal   go to state 51
-    identifier       go to state 106
+	expr  goto 58
+	compare_expr  goto 41
+	add_expr  goto 42
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	opt_expr  goto 175
+	primary_expr  goto 47
+	identifier  goto 48
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 60
+	left_paren  goto 53
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
 
 
 state 173
+	else : TOKEN_ELSE .  (79)
 
-   13 closed_stmt: for left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren closed_stmt .
-
-    $default  reduce using rule 13 (closed_stmt)
+	.  reduce 79
 
 
 state 174
+	closed_stmt : if left_paren expr right_paren closed_stmt else . closed_stmt  (14)
+	open_stmt : if left_paren expr right_paren closed_stmt else . open_stmt  (17)
 
-   18 open_stmt: for left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren open_stmt .
+	TOKEN_PRINT  shift 95
+	TOKEN_FOR  shift 96
+	TOKEN_IF  shift 97
+	TOKEN_RETURN  shift 98
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
 
-    $default  reduce using rule 18 (open_stmt)
+	decl  goto 99
+	expr  goto 144
+	compare_expr  goto 41
+	add_expr  goto 42
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	primary_expr  goto 47
+	open_stmt  goto 176
+	closed_stmt  goto 177
+	identifier  goto 107
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 108
+	return  goto 109
+	print  goto 110
+	for  goto 111
+	left_paren  goto 53
+	if  goto 112
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
+
+
+state 175
+	closed_stmt : for left_paren opt_expr semicolon opt_expr semicolon opt_expr . right_paren closed_stmt  (13)
+	open_stmt : for left_paren opt_expr semicolon opt_expr semicolon opt_expr . right_paren open_stmt  (18)
+
+	TOKEN_RIGHT_PAREN  shift 152
+	.  error
+
+	right_paren  goto 178
+
+
+state 176
+	open_stmt : if left_paren expr right_paren closed_stmt else open_stmt .  (17)
+
+	.  reduce 17
+
+
+state 177
+	closed_stmt : if left_paren expr right_paren closed_stmt else closed_stmt .  (14)
+
+	.  reduce 14
+
+
+state 178
+	closed_stmt : for left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren . closed_stmt  (13)
+	open_stmt : for left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren . open_stmt  (18)
+
+	TOKEN_PRINT  shift 95
+	TOKEN_FOR  shift 96
+	TOKEN_IF  shift 97
+	TOKEN_RETURN  shift 98
+	TOKEN_LEFT_BRACE  shift 31
+	TOKEN_LEFT_PAREN  shift 32
+	TOKEN_NOT  shift 33
+	TOKEN_SUBTRACT  shift 34
+	TOKEN_TRUE  shift 35
+	TOKEN_FALSE  shift 36
+	TOKEN_CHAR_LITERAL  shift 37
+	TOKEN_INTEGER_LITERAL  shift 38
+	TOKEN_STRING_LITERAL  shift 39
+	TOKEN_IDENTIFIER  shift 1
+	.  error
+
+	decl  goto 99
+	expr  goto 144
+	compare_expr  goto 41
+	add_expr  goto 42
+	mul_expr  goto 43
+	expon_expr  goto 44
+	neg_expr  goto 45
+	incr_expr  goto 46
+	primary_expr  goto 47
+	open_stmt  goto 179
+	closed_stmt  goto 180
+	identifier  goto 107
+	string_literal  goto 49
+	integer_literal  goto 50
+	char_literal  goto 51
+	left_brace  goto 108
+	return  goto 109
+	print  goto 110
+	for  goto 111
+	left_paren  goto 53
+	if  goto 112
+	subtract  goto 54
+	not  goto 55
+	true  goto 56
+	false  goto 57
+
+
+state 179
+	open_stmt : for left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren open_stmt .  (18)
+
+	.  reduce 18
+
+
+state 180
+	closed_stmt : for left_paren opt_expr semicolon opt_expr semicolon opt_expr right_paren closed_stmt .  (13)
+
+	.  reduce 13
+
+
+47 terminals, 69 nonterminals
+120 grammar rules, 181 states

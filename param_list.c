@@ -3,7 +3,6 @@
 #include <string.h>
 
 struct param_list *param_list_create(char *name, struct type *type, struct param_list *next) {
-	printf("PARAM_LIST_CREATE\n");
 	struct param_list *param_list = malloc(sizeof(struct param_list));
 	char *n = malloc(sizeof(char) * 256);
 	strcpy(n,name);
@@ -13,14 +12,13 @@ struct param_list *param_list_create(char *name, struct type *type, struct param
 	return param_list;
 }
 
-/*Still to be implemented*/
 void param_list_print(struct param_list *a) {
-	printf("PARAM_LIST_PRINT\n");
 	if(!a)
 		return;
 	printf("%s: ",a->name);
 	type_print(a->type);
-	if(a->next)
+	if(a->next) {
 		printf(", ");
+	}
 	param_list_print(a->next);
 }

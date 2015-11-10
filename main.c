@@ -1,12 +1,13 @@
 #include <string.h>
 #include "token.h"
 #include "decl.h"
+#include "parser.tab.h"
 
 extern FILE *yyin;
 extern char *yytext;
 extern int yyparse();
 extern struct decl *parser_result;
-extern token_t yylex();
+extern int yylex();
 extern void convertString(char *);
 
 int scan(char *filename);
@@ -39,7 +40,7 @@ int scan(char *filename) {
 		exit(1);
 	}
         while(yyin) {
-                token_t t = yylex();
+        	int t = yylex();
                 if (!t)
                         break;
                 printf("%s", token_string(t));
@@ -81,5 +82,6 @@ int parse(char *filename) {
 		}
 		return 0;
 	}*/
+	fclose(yyin);
 	return 1;
 }

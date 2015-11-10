@@ -1,2 +1,4 @@
-"THIS IS INVALID BECAUSE OF NONSENSE OPERATORS"
-13 !>= 14
+main: function integer () = {
+	for: char = 'a';
+	return for;
+}

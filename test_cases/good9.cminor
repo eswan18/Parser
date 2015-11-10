@@ -1,4 +1,3 @@
-"THIS IS JUST RANDOM INPUT"
 printarray: function void ( a: array [] integer, size: integer ) = {
 	i: integer;
 	for( i=0;i<size;i++) {

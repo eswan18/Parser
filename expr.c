@@ -3,7 +3,6 @@
 #include <string.h>
 
 struct expr *expr_create( expr_t kind, struct expr *left, struct expr *right ) {
-	printf("EXPR_CREATE\n");
 	struct expr *expr = malloc(sizeof(struct expr));
 	expr -> kind = kind;
 	expr -> left = left;
@@ -50,9 +49,7 @@ struct expr * expr_create_string_literal( const char *str ) {
 	return expr;
 }
 
-/*Still to be implemented*/
 void expr_print(struct expr *e) {
-	printf("EXPR_PRINT\n");
 	if(!e)
 		return;
 	expr_print(e -> left);
@@ -124,7 +121,8 @@ void expr_pretty_print(struct expr *e) {
 			printf("(");
 			break;
 		case EXPR_LIST:
-			printf(",");
+			if(e->right)
+				printf(",");
 			break;
 		case EXPR_NAME:
 			printf("%s",e->name);

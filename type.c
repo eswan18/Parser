@@ -2,7 +2,6 @@
 #include "type.h"
 
 struct type *type_create(type_kind_t kind, struct param_list *params, struct type *subtype) {
-	printf("TYPE_CREATE\n");
 	struct type *type = malloc(sizeof(struct type));
 	type -> kind = kind;
 	type -> params = params;
@@ -10,9 +9,7 @@ struct type *type_create(type_kind_t kind, struct param_list *params, struct typ
 	return type;
 }
 
-/*Still to be implemented*/
 void type_print(struct type *t) {
-	printf("TYPE_PRINT\n");
 	if(!t)
 		return;
 	switch(t->kind) {
@@ -31,6 +28,11 @@ void type_print(struct type *t) {
 		case TYPE_ARRAY:
 			break;
 		case TYPE_FUNCTION:
+			printf("function ");
+			type_print(t->subtype);
+			printf(" (");
+			param_list_print(t->params);
+			printf(") ");
 			break;
 		case TYPE_VOID:
 			printf("void");

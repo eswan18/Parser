@@ -1,4 +1,9 @@
-"THIS IS ILLEGAL BECAUSE OF NESTED COMMENTS GONE WRONG"
-/* Freedom from the scanner!
-/* even more freedom! */
-still free! nevermind */
+main: function integer () = {
+	if ( x == true && y == false )
+		print "good";
+	else
+		print "no good";
+	else
+		print "what is happening?"
+	return 0;
+}

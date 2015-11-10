@@ -1,2 +1,5 @@
-"THIS IS INVALID BECAUSE OF WEIRD SYMBOLS COMMENTING"
-You know \+ you can't do th@t
+main: function integer (c: char) = {
+	x: integer;
+	x = thing[4] + thing[x]++;
+	return x;
+}

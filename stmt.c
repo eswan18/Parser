@@ -2,7 +2,6 @@
 #include "stmt.h"
 
 struct stmt *stmt_create(stmt_kind_t kind, struct decl *d, struct expr *init_expr, struct expr *e, struct expr *next_expr, struct stmt *body, struct stmt *else_body) {
-	printf("STMT_CREATE\n");
 	struct stmt *stmt = malloc(sizeof(struct stmt));
 	stmt -> kind = kind;
 	stmt -> init_expr = init_expr;
@@ -13,9 +12,7 @@ struct stmt *stmt_create(stmt_kind_t kind, struct decl *d, struct expr *init_exp
 	return stmt;
 }
 
-/*Still to be implemented*/
 void stmt_print(struct stmt *s, int indent) {
-	printf("STMT_PRINT\n");
 	if(!s)
 		return;
 	printf("\n");
@@ -62,8 +59,11 @@ void stmt_print(struct stmt *s, int indent) {
 			printf(";");
 			break;
 		case STMT_RETURN:
-			printf("return ");
-			expr_print(s->expr);
+			printf("return");
+			if (s->expr) {
+				printf(" ");
+				expr_print(s->expr);
+			}
 			printf(";");
 			break;
 		case STMT_BLOCK:
