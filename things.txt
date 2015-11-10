@@ -1,1 +1,3 @@
-x: integer = 2;
+fib: function integer ( x: integer) = {
+ return 1;
+}

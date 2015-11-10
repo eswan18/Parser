@@ -1,6 +1,6 @@
 a: array [5] integer;
 a: array [5] integer = {1,2,3,4,5};
-x: integer;
+/*x: integer;
 y: integer = 123;
 b: boolean = false;
 c: char    = 'q';
@@ -11,4 +11,4 @@ y: integer = 5;
 b = x<y;
 
 f: integer = 0;
-c: char = '\a';
+c: char = '\a';*/

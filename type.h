@@ -17,9 +17,10 @@ struct type {
 	type_kind_t kind;
 	struct param_list *params;
 	struct type *subtype;
+	struct expr *length; //for arrays of declared length
 };
 
-struct type * type_create( type_kind_t kind, struct param_list *params, struct type *subtype );
-void          type_print( struct type *t );
+struct type * type_create(type_kind_t kind, struct param_list *params, struct type *subtype, struct expr *length);
+void          type_print(struct type *t);
 
 #endif

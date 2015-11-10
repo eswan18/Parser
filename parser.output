@@ -95,7 +95,7 @@
   72  not_empty_param_list : param
   73                       | param comma not_empty_param_list
 
-  74  param : type colon identifier
+  74  param : identifier colon type
 
   75  print : TOKEN_PRINT
 
@@ -971,26 +971,13 @@ state 61
 	type : function type left_paren . param_list right_paren  (69)
 	param_list : .  (71)
 
-	TOKEN_FUNCTION  shift 9
-	TOKEN_STRING  shift 10
-	TOKEN_INTEGER  shift 11
-	TOKEN_CHAR  shift 12
-	TOKEN_VOID  shift 13
-	TOKEN_BOOLEAN  shift 14
-	TOKEN_ARRAY  shift 15
+	TOKEN_IDENTIFIER  shift 1
 	TOKEN_RIGHT_PAREN  reduce 71
 
-	type  goto 119
-	param_list  goto 120
-	not_empty_param_list  goto 121
-	param  goto 122
-	integer  goto 17
-	void  goto 18
-	string  goto 19
-	char  goto 20
-	boolean  goto 21
-	array  goto 22
-	function  goto 23
+	param_list  goto 119
+	not_empty_param_list  goto 120
+	param  goto 121
+	identifier  goto 122
 
 
 state 62
@@ -1982,37 +1969,37 @@ state 118
 
 
 state 119
-	param : type . colon identifier  (74)
-
-	TOKEN_COLON  shift 7
-	.  error
-
-	colon  goto 155
-
-
-state 120
 	type : function type left_paren param_list . right_paren  (69)
 
 	TOKEN_RIGHT_PAREN  shift 152
 	.  error
 
-	right_paren  goto 156
+	right_paren  goto 155
 
 
-state 121
+state 120
 	param_list : not_empty_param_list .  (70)
 
 	.  reduce 70
 
 
-state 122
+state 121
 	not_empty_param_list : param .  (72)
 	not_empty_param_list : param . comma not_empty_param_list  (73)
 
 	TOKEN_COMMA  shift 139
 	TOKEN_RIGHT_PAREN  reduce 72
 
-	comma  goto 157
+	comma  goto 156
+
+
+state 122
+	param : identifier . colon type  (74)
+
+	TOKEN_COLON  shift 7
+	.  error
+
+	colon  goto 157
 
 
 state 123
@@ -2448,22 +2435,24 @@ state 154
 
 
 state 155
-	param : type colon . identifier  (74)
-
-	TOKEN_IDENTIFIER  shift 1
-	.  error
-
-	identifier  goto 165
-
-
-state 156
 	type : function type left_paren param_list right_paren .  (69)
 
 	.  reduce 69
 
 
-state 157
+state 156
 	not_empty_param_list : param comma . not_empty_param_list  (73)
+
+	TOKEN_IDENTIFIER  shift 1
+	.  error
+
+	not_empty_param_list  goto 165
+	param  goto 121
+	identifier  goto 122
+
+
+state 157
+	param : identifier colon . type  (74)
 
 	TOKEN_FUNCTION  shift 9
 	TOKEN_STRING  shift 10
@@ -2474,9 +2463,7 @@ state 157
 	TOKEN_ARRAY  shift 15
 	.  error
 
-	type  goto 119
-	not_empty_param_list  goto 166
-	param  goto 122
+	type  goto 166
 	integer  goto 17
 	void  goto 18
 	string  goto 19
@@ -2544,15 +2531,15 @@ state 164
 
 
 state 165
-	param : type colon identifier .  (74)
-
-	.  reduce 74
-
-
-state 166
 	not_empty_param_list : param comma not_empty_param_list .  (73)
 
 	.  reduce 73
+
+
+state 166
+	param : identifier colon type .  (74)
+
+	.  reduce 74
 
 
 state 167

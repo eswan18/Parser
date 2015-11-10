@@ -315,25 +315,25 @@ primary_expr: identifier {
 	;
 
 type: integer {
-	$$ = type_create(TYPE_INTEGER,0,0);
+	$$ = type_create(TYPE_INTEGER,0,0,0);
 }
 	| void {
-	$$ = type_create(TYPE_VOID,0,0);
+	$$ = type_create(TYPE_VOID,0,0,0);
 }
 	| string {
-	$$ = type_create(TYPE_STRING,0,0);
+	$$ = type_create(TYPE_STRING,0,0,0);
 }
 	| char {
-	$$ = type_create(TYPE_CHARACTER,0,0);
+	$$ = type_create(TYPE_CHARACTER,0,0,0);
 }
 	| boolean {
-	$$ = type_create(TYPE_BOOLEAN,0,0);
+	$$ = type_create(TYPE_BOOLEAN,0,0,0);
 }
 	| array left_bracket opt_expr right_bracket type {
-	$$ = type_create(TYPE_ARRAY,0,$5);
+	$$ = type_create(TYPE_ARRAY,0,$5,$3);
 }
 	| function type left_paren param_list right_paren {
-	$$ = type_create(TYPE_FUNCTION,$4,$2);
+	$$ = type_create(TYPE_FUNCTION,$4,$2,0);
 }
 	;
 
@@ -353,8 +353,8 @@ not_empty_param_list: param {
 }
 	;
 
-param:	type colon identifier {
-	$$ = param_list_create($3,$1,0);
+param:	identifier colon type {
+	$$ = param_list_create($1,$3,0);
 }
 	;
 

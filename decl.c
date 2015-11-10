@@ -34,6 +34,8 @@ void decl_print(struct decl *d, int indent) {
 		for(i=0;i<indent;i++)
 			printf("\t");
 		printf("}");
+	} else {
+		printf(";");
 	}
 	printf("\n");
 	decl_print(d->next,indent);
