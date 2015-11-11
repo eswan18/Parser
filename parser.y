@@ -174,8 +174,8 @@ not_empty_stmt_list: stmt not_empty_stmt_list {
 }
 	;
 
-expr: identifier assign expr {
-	$$ = expr_create(EXPR_ASSIGN,expr_create_name($1),$3);
+expr: expr assign and_expr {
+	$$ = expr_create(EXPR_ASSIGN,$1,$3);
 }
 	| and_expr {
 	$$ = $1;
