@@ -413,7 +413,23 @@ semicolon: TOKEN_SEMICOLON;
 true: TOKEN_TRUE;
 false: TOKEN_FALSE;
 char_literal: TOKEN_CHAR_LITERAL {
-	$$ = yytext[1];
+	char c = yytext[1];
+	if (c != '\\')
+		$$ = c;
+	else {
+		char d = yytext[2];
+		switch(d) {
+			case '0':
+				$$ = '\0';
+				break;
+			case 'n':
+				$$ = '\n';
+				break;
+			default:
+				$$ = d;
+				break;
+		}
+	}
 };
 integer_literal: TOKEN_INTEGER_LITERAL {
 	$$ = atoi(yytext);
