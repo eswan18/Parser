@@ -79,7 +79,7 @@ struct decl *parser_result = 0;
 
 
 %type <decl> program decl_list decl;
-%type <expr> expr compare_expr add_expr mul_expr expon_expr neg_expr incr_expr opt_expr expr_list not_empty_expr_list primary_expr;
+%type <expr> expr and_expr compare_expr add_expr mul_expr expon_expr neg_expr incr_expr opt_expr expr_list not_empty_expr_list primary_expr;
 %type <stmt> stmt open_stmt closed_stmt stmt_list not_empty_stmt_list;
 %type <type> type;
 %type <param_list> param_list not_empty_param_list param;
@@ -142,7 +142,7 @@ closed_stmt: decl {
 	$$ = stmt_create(STMT_IF_ELSE,0,0,$3,0,$5,$7);
 }
 	| left_brace stmt_list right_brace {
-	$$ = stmt_create(STMT_BLOCK,0,0,0,0,0,$2);
+	$$ = stmt_create(STMT_BLOCK,0,0,0,0,$2,0);
 }
 	;
 
@@ -173,10 +173,17 @@ not_empty_stmt_list: stmt not_empty_stmt_list {
 }
 	;
 
-expr: expr and compare_expr {
+expr: identifier assign expr {
+	$$ = expr_create(EXPR_ASSIGN,expr_create_name($1),$3);
+}
+	| and_expr {
+	$$ = $1;
+}
+
+and_expr: and_expr and compare_expr {
 	$$ = expr_create(EXPR_ADD,$1,$3);
 }
-	| expr or compare_expr {
+	| and_expr or compare_expr {
 	$$ = expr_create(EXPR_OR,$1,$3);
 }
 	| compare_expr {

@@ -63,6 +63,9 @@ void expr_pretty_print(struct expr *e) {
 	if (!e)
 		return;
 	switch(e->kind) {
+		case EXPR_ASSIGN:
+			printf("=");
+			break;
 		case EXPR_ADD:
 			printf("+");
 			break;
