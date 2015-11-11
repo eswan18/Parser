@@ -1,0 +1,4 @@
+main: function integer () = {
+	func: function void (input: integer) ;
+
+}

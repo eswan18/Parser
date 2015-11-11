@@ -33,7 +33,7 @@ struct expr * expr_create_integer_literal( int c ) {
 	return expr;
 }
 
-struct expr * expr_create_character_literal( int c) {
+struct expr * expr_create_character_literal(int c) {
 	struct expr *expr = malloc(sizeof(struct expr));
 	expr -> kind = EXPR_CHARACTER_LITERAL;
 	expr -> literal_value = c;
@@ -57,6 +57,8 @@ void expr_print(struct expr *e) {
 	expr_print(e->right);
 	if (e->kind == EXPR_FUNC)
 		printf(")");
+	if (e->kind == EXPR_ARRAY_DEREF)
+		printf("]");
 }
 
 void expr_pretty_print(struct expr *e) {
@@ -127,6 +129,9 @@ void expr_pretty_print(struct expr *e) {
 			if(e->right)
 				printf(",");
 			break;
+		case EXPR_ARRAY_DEREF:
+			printf("[");
+			break;
 		case EXPR_NAME:
 			printf("%s",e->name);
 			break;
@@ -140,10 +145,10 @@ void expr_pretty_print(struct expr *e) {
 			printf("%i",e->literal_value);
 			break;
 		case EXPR_CHARACTER_LITERAL:
-			printf("%c",e->literal_value);
+			printf("'%c'",e->literal_value);
 			break;
 		case EXPR_STRING_LITERAL:
-			printf("%s",e->string_literal);
+			printf("\"%s\"",e->string_literal);
 			break;
 	}
 }

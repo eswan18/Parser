@@ -7,4 +7,4 @@ printarray: function void ( a: array [] integer, size: integer ) = {
 
 a: char = 'a';
 str: string = "string";
-impossible = str + a;
+impossible: integer = str + a;

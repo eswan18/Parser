@@ -29,6 +29,7 @@ void stmt_print(struct stmt *s, int indent) {
 			break;
 		case STMT_EXPR:
 			expr_print(s->expr);
+			printf(";");
 			break;
 		case STMT_IF_ELSE:
 			printf("if(");

@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
 	if (strcmp(option,"-scan") == 0) {
 		scan(filename);
 	} else if (strcmp(option,"-parse") == 0) {
-		parse(filename);
+		return parse(filename);
 	}
 	
         return 0;

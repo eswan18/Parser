@@ -1,0 +1,6 @@
+main: function integer (c: character) = {
+	x: integer;
+
+	x=thing[4]+thing[x]++;
+	return x;
+}
